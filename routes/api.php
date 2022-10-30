@@ -18,9 +18,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get("/", function () {
-    // return Customer::first()->order_items;
+    return Customer::first()->user->name;
     // return User::has('orders')->get();
-    return User::has('order_items')->get();
+    //return User::has('order_items')->get();
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

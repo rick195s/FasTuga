@@ -9,6 +9,40 @@ class Order extends Model
 {
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'ticket_number',
+        'status',
+        'customer_id',
+        'total_price',
+        'total_paid',
+        'total_paid_with_points',
+        'points_gained',
+        'points_used_to_pay',
+        'payment_type',
+        'payment_reference',
+        'date',
+        'delivered_by'
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [];
+
 
     // relation customers 1:n orders
     public function customer()

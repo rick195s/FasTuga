@@ -10,7 +10,34 @@ class Customer extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'customers';
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'user_id',
+        'phone',
+        'points',
+        'nif',
+        'default_payment_type',
+        'default_payment_reference',
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [];
+
 
 
     // relation customer 1:n order

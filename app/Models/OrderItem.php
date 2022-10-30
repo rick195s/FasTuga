@@ -16,6 +16,35 @@ class OrderItem extends Model
      */
     public $timestamps = false;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'order_id',
+        'order_local_number',
+        'product_id',
+        'status',
+        'price',
+        'preparation_by',
+        'notes'
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [];
+
 
     // relation order 1:n order_item
     public function order()
