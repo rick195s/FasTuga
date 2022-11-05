@@ -47,6 +47,30 @@ class User extends Authenticatable
     ];
 
 
+    // check if user is customer
+    public function is_customer()
+    {
+        return $this->type == 'C';
+    }
+
+    // check if user is manager
+    public function is_manager()
+    {
+        return $this->type == 'EM';
+    }
+
+    // check if user is employee chef
+    public function is_employee_chef()
+    {
+        return $this->type == 'EC';
+    }
+
+    // check if user is employee delivery
+    public function is_employee_delivery()
+    {
+        return $this->type == 'ED';
+    }
+
     // relation user 1:n order
     public function orders()
     {
