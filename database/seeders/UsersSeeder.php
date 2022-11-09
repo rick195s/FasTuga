@@ -14,10 +14,10 @@ class UsersSeeder extends Seeder
     private $typesOfUsersDesc =  ['Manager', 'Chef', 'Delivery', 'Customer'];
     private $typesOfUsers =             ['EM', 'EC', 'ED', 'C'];
 
-// TESTING SEEDER
-//    private $numberOfUsers =            [4,    10,    10,   20];
-//    private $numberOfFixedUsers =       [2,    3,     3,    5];
-//    private $numberOfSoftDeletedUsers = [1,    4,     4,    4];
+    // TESTING SEEDER
+    //    private $numberOfUsers =            [4,    10,    10,   20];
+    //    private $numberOfFixedUsers =       [2,    3,     3,    5];
+    //    private $numberOfSoftDeletedUsers = [1,    4,     4,    4];
 
     private $numberOfUsers =            [4,    10,    10,   200];
     private $numberOfFixedUsers =       [2,    3,     3,    10];
@@ -157,8 +157,7 @@ class UsersSeeder extends Seeder
             $paymentType = $faker->randomElement($this->paymentTypes);
             if (($paymentType == 'PAYPAL') && (rand(1, 15) > 2)) {
                 $paymentRef = $userInfo['email'];
-            }
-            else {
+            } else {
                 $paymentRef = static::getRandomPaymentReference($faker, $paymentType);
             }
 
@@ -166,14 +165,30 @@ class UsersSeeder extends Seeder
                 'user_id' => $newId,
                 'phone' => (($paymentType == 'MBWAY') && (rand(1, 15) > 2)) ? $paymentRef : $faker->phoneNumber,
                 'nif' => $faker->randomNumber($nbDigits = 9, $strict = true),
-                'points' => rand(0,125),
+                'points' => rand(0, 125),
                 'default_payment_type' => $paymentType,
                 'default_payment_reference' => $paymentRef,
                 'created_at' => $user['created_at'],
                 'updated_at' => $user['updated_at'],
                 'deleted_at' => $user['deleted_at'],
             ]);
+        } elseif ($user['type'] == 'ED' && rand(1, 100) < 40) {
+            // Used to create Employee Delivery Drivers (FasTuga Driver Integration)
+
+            DB::table('drivers')->insert([
+                'user_id' => $newId,
+                'phone' => $faker->phoneNumber,
+
+                'license_plate' => $faker->regexify('[A-Z0-9]{2}-[A-Z0-9]{2}-[A-Z0-9]{2}'),
+                //'license_plate' => $faker->regexify('[\d\w]{2}[-][\d\w]{2}[-][\d\w]{2}|[\d\w]{2}[ ][\d\w]{2}[ ][\d\w]{2}'),
+
+                'created_at' => $user['created_at'],
+                'updated_at' => $user['updated_at'],
+                'deleted_at' => $user['deleted_at'],
+            ]);
         }
+
+
         return $userInfo;
     }
 
@@ -261,5 +276,4 @@ class UsersSeeder extends Seeder
         UsersSeeder::$used_emails[] = $email;
         $gender = $gender == 'male' ? 'M' : 'F';
     }
-
 }
