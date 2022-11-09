@@ -16,6 +16,7 @@ class OrdersSeeder extends Seeder
     private $customerDetails = [];
     private $chefIDs = [];
     private $deliveryIDs = [];
+    private $driversIDs = [];
     private $productIDs = [];
     private $productPrices = [];
     private $paymentTypes = ['VISA', 'PAYPAL', 'MBWAY'];
@@ -46,6 +47,10 @@ class OrdersSeeder extends Seeder
         $this->command->info("Preparing Delivery");
         $this->deliveryIDs = Arr::pluck(DB::select("select id  from users where type = 'ED'"), 'id');
 
+        // Used to create Orders_Driver_Delivery (FasTuga Driver Integration)
+        $this->command->info("Preparing Drivers");
+        $this->driversIDs = Arr::pluck(DB::select("select user_id from drivers"), 'user_id');
+
         $this->command->info("Preparing Customers");
         $arrayCustomers = DB::select('select id, user_id, default_payment_type, default_payment_reference from customers');
         $this->customerIDs = Arr::pluck($arrayCustomers, 'id');
@@ -73,18 +78,34 @@ class OrdersSeeder extends Seeder
             $totalOrdersDay = intval($this->avgOrdersDay[$d->dayOfWeek] + $this->avgOrdersDay[$d->dayOfWeek] * rand(-20, 20) / 100);
             $totalOrdersDay = $totalOrdersDay < 0 ? 0 : $totalOrdersDay;
             $ordersDay = [];
+            $ordersDriverDelivery = [];
             for ($num = 0; $num < $totalOrdersDay; $num++) {
                 $ordersDay[] = $this->createOrderArray($faker, $d, $num);
             }
             DB::table('orders')->insert($ordersDay);
-            $ids = DB::table('orders')->where('date', $d->format('Y-m-d'))->pluck('id')->toArray();
 
-            foreach ($ids as $id) {
+            $ordersAux = DB::table('orders')->select('id', 'delivered_by', 'created_at')
+                ->where('date', $d->format('Y-m-d'))->get()->toArray();
+
+            foreach ($ordersAux as $order) {
                 $allItems = [];
-                $total = $this->createOrderItemsArray($faker, $allItems, $id);
+                $total = $this->createOrderItemsArray($faker, $allItems, $order->id);
                 DB::table('order_items')->insert($allItems);
                 //DB::update('update orders set total_price = ? where id = ?', [$total, $id]);
+
+                // Check if order was delivered by a driver
+                // if so we need to create the corresponding record
+                // in orders_driver_delivery  (FasTuga Driver Integration)
+                if (in_array($order->delivered_by, $this->driversIDs)) {
+                    $ordersDriverDelivery[] = $this->createOrdersDriverDeliveryArray($faker, $order->id, $order->created_at);
+                }
             }
+
+            $this->command->info("Entregas ao domicilio:  " . count($ordersDriverDelivery));
+
+            // (FasTuga Driver Integration)
+            DB::table('orders_driver_delivery')->insert($ordersDriverDelivery);
+
             $i++;
             $d->addDays(1);
         }
@@ -148,12 +169,30 @@ class OrdersSeeder extends Seeder
         }
     }
 
+    // Create the orders_driver_delivery record (FasTuga Driver Integration)
+    private function createOrdersDriverDeliveryArray($faker, $id_order, $created_at)
+    {
+
+        $inicio = Carbon::parse($created_at)->addSeconds(rand(39600, 78000));
+        $fim = $inicio->copy()->addSeconds(rand(100, 900));
+
+        $tax_fee = Arr::random([2, 3, 5]);
+
+        return [
+            'order_id' => $id_order,
+            'delivery_location' => $faker->address,
+            'tax_fee' => $tax_fee,
+            'delivery_started_at' => $inicio,
+            'delivery_ended_at' => $fim,
+
+        ];
+    }
 
     private function seedPoints()
     {
         $allOrdersOfCustomers = DB::select("select id, total_price div 10 as points from orders where customer_id is not null and status = 'D' order by id");
         foreach ($allOrdersOfCustomers as $order) {
-            DB::update("update orders set points_gained = ? where id = ?" , [$order->points, $order->id]);
+            DB::update("update orders set points_gained = ? where id = ?", [$order->points, $order->id]);
         }
 
         $allCustomers = DB::select("select customer_id, sum(points_gained) as total_points from orders where customer_id is not null and status = 'D' group by customer_id order by customer_id");
@@ -164,9 +203,11 @@ class OrdersSeeder extends Seeder
         $customersWithExtraPoints = DB::select("select id, points from customers where points >= 10");
         foreach ($customersWithExtraPoints as $customer) {
             $totalPoints = $customer->points;
-            $totalOrders = intdiv($totalPoints-10, 10);
-            $ordersToChange = DB::select("select id, total_price, points_gained from orders where customer_id = ? and status = 'D' and total_price > 5 order by created_at desc limit ?",
-                [$customer->id, $totalOrders]);
+            $totalOrders = intdiv($totalPoints - 10, 10);
+            $ordersToChange = DB::select(
+                "select id, total_price, points_gained from orders where customer_id = ? and status = 'D' and total_price > 5 order by created_at desc limit ?",
+                [$customer->id, $totalOrders]
+            );
             foreach ($ordersToChange as $order) {
                 $oldPrice = $order->total_price;
                 $oldPoints = $order->points_gained;
@@ -175,8 +216,10 @@ class OrdersSeeder extends Seeder
                 $totalPaidWithPoints = $usePointTen * 5;
                 $newPrice = $oldPrice - $totalPaidWithPoints;
                 $newPoints = intdiv($newPrice, 10);
-                DB::update("update orders set total_paid_with_points = ?, total_paid = ?, points_gained = ?, points_used_to_pay = ? where id = ?",
-                    [$totalPaidWithPoints, $oldPrice - $totalPaidWithPoints, $newPoints, $usePointTen * 10, $order->id]);
+                DB::update(
+                    "update orders set total_paid_with_points = ?, total_paid = ?, points_gained = ?, points_used_to_pay = ? where id = ?",
+                    [$totalPaidWithPoints, $oldPrice - $totalPaidWithPoints, $newPoints, $usePointTen * 10, $order->id]
+                );
                 DB::update("update customers set points = points + ? where id = ?", [$newPoints - $oldPoints - $usePointTen * 10, $customer->id]);
                 if ($totalOrders <= 0) {
                     break;
@@ -186,4 +229,3 @@ class OrdersSeeder extends Seeder
         }
     }
 }
-

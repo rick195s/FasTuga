@@ -26,6 +26,8 @@ class DatabaseSeeder extends Seeder
 
         DB::table('users')->delete();
         DB::table('customers')->delete();
+        DB::table('drivers')->delete();
+        DB::table('orders_driver_delivery')->delete();
         DB::table('products')->delete();
         DB::table('order_items')->delete();
         DB::table('orders')->delete();
