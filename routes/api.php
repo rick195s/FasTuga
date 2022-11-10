@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\RegisterDriverController;
 use App\Models\Customer;
 use App\Models\Driver;
 use App\Models\Order;
@@ -26,9 +27,7 @@ Route::get("/", function () {
 });
 
 
-Route::post("/register", function () {
-    return ["register"];
-});
+Route::post("/register/driver", [RegisterDriverController::class, "store"]);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
