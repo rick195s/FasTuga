@@ -3,6 +3,7 @@
 use App\Models\Customer;
 use App\Models\Driver;
 use App\Models\Order;
+use App\Models\OrderDriverDelivery;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -19,7 +20,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get("/", function () {
-    return Driver::first()->orders;
+    return Driver::first()->ordersDriverDelivery->first()->order;
     // return User::has('orders')->get();
     //return User::has('order_items')->get();
 });

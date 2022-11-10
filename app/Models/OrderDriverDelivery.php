@@ -4,12 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 // FasTuga Driver integration
-class Driver extends Model
+class OrderDriverDelivery extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -17,10 +16,16 @@ class Driver extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'user_id',
-        'phone',
-        'license_plate',
+        'order_id',
+        'delivery_location',
+        'tax_fee',
+        'delivery_started_at',
+        'delivery_ended_at',
     ];
+
+    protected $table = 'orders_driver_delivery';
+
+    public $timestamps = false;
 
     /**
      * The attributes that should be hidden for serialization.
@@ -36,15 +41,15 @@ class Driver extends Model
      */
     protected $casts = [];
 
-    // relation driver 1:n ordersDriverDelivery
-    public function ordersDriverDelivery()
+    // relation order_driver_delivery 1:1 order
+    public function order()
     {
-        return $this->hasManyThrough(OrderDriverDelivery::class, Order::class, 'delivered_by', 'order_id', 'user_id', 'id');
+        return $this->belongsTo(Order::class);
     }
 
-    // relation driver 1:1 user
-    public function user()
+    // relation order_driver_delivery 1:1 driver
+    public function deliveredBy()
     {
-        return $this->belongsTo(User::class);
+        return $this->order->deliveredBy();
     }
 }

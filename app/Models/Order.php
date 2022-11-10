@@ -57,10 +57,15 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    // relation order 1:1 order_driver_delivery
+    public function orderDriverDelivery()
+    {
+        return $this->hasOne(OrderDriverDelivery::class);
+    }
 
     // relation user 1:n order
     public function deliveredBy()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'delivered_by', 'id');
     }
 }
