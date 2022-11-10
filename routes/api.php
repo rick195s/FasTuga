@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Customer;
+use App\Models\Driver;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -17,11 +18,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Route::get("/", function () {
-//     return Customer::first()->user->name;
-//     // return User::has('orders')->get();
-//     //return User::has('order_items')->get();
-// });
+Route::get("/", function () {
+    return Driver::first()->orders;
+    // return User::has('orders')->get();
+    //return User::has('order_items')->get();
+});
 
 
 Route::post("/register", function () {

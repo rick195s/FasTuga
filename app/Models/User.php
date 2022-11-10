@@ -88,4 +88,10 @@ class User extends Authenticatable
     {
         return $this->hasOne(Customer::class);
     }
+
+    // relation driver 1:1 user
+    public function driver()
+    {
+        return $this->hasOne(Driver::class);
+    }
 }
