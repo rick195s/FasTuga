@@ -36,7 +36,7 @@ class RegisterUserRequest extends FormRequest
 
                 // if user is authenticate just the managers can fill
                 // the 'type' field
-                Rule::prohibitedIf(Auth::user() && !Auth::user()->is_manager)
+                Rule::prohibitedIf(Auth::user() && !Auth::user()->isManager)
             ],
             'phone' => [
                 Rule::requiredIf($this->type == 'C'),

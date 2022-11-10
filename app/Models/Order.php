@@ -51,8 +51,8 @@ class Order extends Model
     }
 
 
-    // relation order 1:n order_items
-    public function order_items()
+    // relation order 1:n orderItems
+    public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
     }

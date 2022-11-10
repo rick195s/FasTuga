@@ -40,7 +40,7 @@ class Product extends Model
 
 
     // relation product 1:n order_item
-    public function order_items()
+    public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
     }

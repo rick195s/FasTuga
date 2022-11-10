@@ -48,25 +48,25 @@ class User extends Authenticatable
 
 
     // check if user is customer
-    public function is_customer()
+    public function isCustomer()
     {
         return $this->type == 'C';
     }
 
     // check if user is manager
-    public function is_manager()
+    public function isManager()
     {
         return $this->type == 'EM';
     }
 
     // check if user is employee chef
-    public function is_employee_chef()
+    public function isEmployeeChef()
     {
         return $this->type == 'EC';
     }
 
     // check if user is employee delivery
-    public function is_employee_delivery()
+    public function isEmployeeDelivery()
     {
         return $this->type == 'ED';
     }
@@ -78,7 +78,7 @@ class User extends Authenticatable
     }
 
     // relation user 1:n order
-    public function order_items()
+    public function orderItems()
     {
         return $this->hasMany(OrderItem::class, 'preparation_by');
     }
