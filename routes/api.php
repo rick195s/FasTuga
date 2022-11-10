@@ -17,10 +17,15 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get("/", function () {
-    return Customer::first()->user->name;
-    // return User::has('orders')->get();
-    //return User::has('order_items')->get();
+// Route::get("/", function () {
+//     return Customer::first()->user->name;
+//     // return User::has('orders')->get();
+//     //return User::has('order_items')->get();
+// });
+
+
+Route::post("/register", function () {
+    return ["register"];
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
