@@ -41,7 +41,8 @@ class Driver extends Model
     // relation driver 1:n order
     public function orders()
     {
-        return $this->hasMany(Order::class, 'delivered_by', 'user_id');
+        //return $this->hasMany(Order::class, 'delivered_by', 'user_id');
+        return $this->user->orders();
     }
 
     // relation driver 1:1 user
