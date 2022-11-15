@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\RegisterDriverRequest;
+use App\Http\Resources\UserResource;
 use App\Models\Customer;
 use App\Models\Driver;
 use App\Models\User;
@@ -12,6 +13,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+
 
 class RegisterDriverController extends Controller
 {
@@ -31,7 +33,9 @@ class RegisterDriverController extends Controller
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'type' => 'ED'
+            'type' => 'ED',
+            'blocked' => 0,
+
         ]);
 
         Driver::create([
@@ -47,6 +51,6 @@ class RegisterDriverController extends Controller
         $user = auth()->user();
         $token = $user->createToken("authToken")->accessToken;
 
-        return response(["user" => $user, "token" => $token]);
+        return response(["user" => new UserResource($user), "token" => $token]);
     }
 }

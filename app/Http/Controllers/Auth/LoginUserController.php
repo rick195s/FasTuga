@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 
 class LoginUserController extends Controller
@@ -15,7 +16,7 @@ class LoginUserController extends Controller
             $user = auth()->user();
             $token = $user->createToken("authToken")->accessToken;
 
-            return response(["user" => $user, "token" => $token]);
+            return response(["user" => new UserResource($user), "token" => $token]);
         }
 
         return response(["message" => "Invalid credentials"]);

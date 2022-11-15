@@ -46,6 +46,23 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    public function typeToString()
+    {
+        switch ($this->type) {
+            case 'EC':
+                return "Employee Chef";
+
+            case 'ED':
+                return "Employee Delivery";
+
+            case 'EM':
+                return "Employee Manager";
+
+            case 'C':
+            default:
+                return "Customer";
+        }
+    }
 
     // check if user is customer
     public function isCustomer()
