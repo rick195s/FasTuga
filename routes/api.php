@@ -3,11 +3,13 @@
 use App\Http\Controllers\Auth\LoginUserController;
 use App\Http\Controllers\Auth\RegisterDriverController;
 use App\Http\Resources\CustomerResource;
+use App\Http\Resources\OrderItemResource;
 use App\Http\Resources\ProductResource;
 use App\Models\Customer;
 use App\Models\Driver;
 use App\Models\Order;
 use App\Models\OrderDriverDelivery;
+use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -25,7 +27,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get("/", function () {
-    return [new ProductResource(Product::first())];
+    return [new OrderItemResource(OrderItem::find(1))];
     // return User::has('orders')->get();
     //return User::has('order_items')->get();
 });
