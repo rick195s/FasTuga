@@ -15,13 +15,11 @@ class CustomerResource extends JsonResource
     public function toArray($request)
     {
         return [
-            "id" => $this->user->id,
-            "customer_id" => $this->id,
-
             $this->merge(function () {
                 return new UserResource($this->user()->withTrashed()->first());
             }),
 
+            "customer_id" => $this->id,
             "phone" => $this->phone,
             "points" => $this->points,
             "nif" => $this->nif,
