@@ -48,8 +48,16 @@ class OrderDriverDelivery extends Model
     }
 
     // relation order_driver_delivery 1:1 driver
+    // https://laravel.com/docs/9.x/eloquent-relationships#has-one-through
     public function deliveredBy()
     {
-        return $this->order->deliveredBy();
+        return $this->hasOneThrough(
+            Driver::class,
+            Order::class,
+            'id', // Foreign key on the orders table...
+            'user_id', // Foreign key on the drivers table...
+            'order_id', // Local key on the orders_driver_delivery table...
+            'delivered_by' // Local key on the orders table...
+        );
     }
 }

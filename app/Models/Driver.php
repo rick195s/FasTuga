@@ -37,9 +37,17 @@ class Driver extends Model
     protected $casts = [];
 
     // relation driver 1:n ordersDriverDelivery
+    // https://laravel.com/docs/9.x/eloquent-relationships#has-many-through
     public function ordersDriverDelivery()
     {
-        return $this->hasManyThrough(OrderDriverDelivery::class, Order::class, 'delivered_by', 'order_id', 'user_id', 'id');
+        return $this->hasManyThrough(
+            OrderDriverDelivery::class,
+            Order::class,
+            'delivered_by', // Foreign key on the orders table...
+            'order_id', // Foreign key on the orders_driver_delivery table...
+            'user_id', // Local key on the drivers table...
+            'id' // Local key on the orders table...
+        );
     }
 
     // relation driver 1:1 user

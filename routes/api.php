@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\LoginUserController;
 use App\Http\Controllers\Auth\RegisterDriverController;
 use App\Http\Resources\CustomerResource;
 use App\Http\Resources\DriverResource;
+use App\Http\Resources\OrderDriverDeliveryResource;
 use App\Http\Resources\OrderItemResource;
 use App\Http\Resources\OrderResource;
 use App\Http\Resources\ProductResource;
@@ -29,7 +30,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get("/", function () {
-    return [new DriverResource(Driver::first())];
+    return [new OrderDriverDeliveryResource(OrderDriverDelivery::first())];
     // return User::has('orders')->get();
     //return User::has('order_items')->get();
 });
