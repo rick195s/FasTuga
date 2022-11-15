@@ -18,8 +18,8 @@ class CustomerResource extends JsonResource
             "id" => $this->user->id,
             "customer_id" => $this->id,
 
-            $this->mergeWhen($this->user->exists(), function () {
-                return new UserResource($this->user);
+            $this->merge(function () {
+                return new UserResource($this->user()->withTrashed()->first());
             }),
 
             "phone" => $this->phone,
