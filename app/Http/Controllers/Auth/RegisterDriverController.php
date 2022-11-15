@@ -44,8 +44,9 @@ class RegisterDriverController extends Controller
 
         Auth::login($user);
 
-        return response()->json([
-            'message' => 'Driver registered successfully',
-        ]);
+        $user = auth()->user();
+        $token = $user->createToken("authToken")->accessToken;
+
+        return response(["user" => $user, "token" => $token]);
     }
 }
