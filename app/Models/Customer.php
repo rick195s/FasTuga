@@ -51,4 +51,23 @@ class Customer extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+
+    public function defaultPaymentId()
+    {
+        if ($this->default_payment_id == null) {
+            switch ($this->default_payment_type) {
+                case 'MBWAY':
+                    return $this->phone;
+
+                case 'PAYPAL':
+                    return $this->email;
+
+                default:
+                    return $this->default_payment_id;
+            }
+        }
+
+        return $this->default_payment_id;
+    }
 }

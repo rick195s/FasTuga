@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\LoginUserController;
 use App\Http\Controllers\Auth\RegisterDriverController;
+use App\Http\Resources\CustomerResource;
 use App\Models\Customer;
 use App\Models\Driver;
 use App\Models\Order;
@@ -22,7 +23,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get("/", function () {
-    return Driver::first()->ordersDriverDelivery->first()->order;
+    return [new CustomerResource(Customer::first())];
     // return User::has('orders')->get();
     //return User::has('order_items')->get();
 });
