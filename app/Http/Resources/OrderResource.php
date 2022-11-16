@@ -26,9 +26,8 @@ class OrderResource extends JsonResource
             "payment_type" => $this->payment_type,
             "payment_reference" => $this->payment_reference,
             "date" => $this->date,
-            "customer" => new CustomerResource($this->customer()->withTrashed()->first()),
-            "delivery_by" => new UserResource($this->deliveredBy()->withTrashed()->first()),
-            "order_items" => OrderItemResource::collection($this->orderItems),
+            "customer" => $this->customer_id,
+            "delivery_by" => $this->delivered_by,
         ];
     }
 }
