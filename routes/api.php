@@ -30,7 +30,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get("/", function () {
-    return [new DriverResource(Driver::first())];
+    return Order::whereHas("orderDriverDelivery")->first()->orderDriverDelivery;
     // return User::has('orders')->get();
     //return User::has('order_items')->get();
 });

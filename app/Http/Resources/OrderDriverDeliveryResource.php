@@ -15,7 +15,6 @@ class OrderDriverDeliveryResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id' => $this->order_id,
             'order_driver_delivery_id' => $this->id,
             'delivery_location' => $this->delivery_location,
             'tax_fee' => $this->tax_fee,
