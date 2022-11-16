@@ -20,7 +20,7 @@ class OrderDriverDeliveryResource extends JsonResource
             'tax_fee' => $this->tax_fee,
             'delivery_started_at' => $this->delivery_started_at,
             'delivery_ended_at' => $this->delivery_ended_at,
-            'delivered_by' => new DriverResource($this->deliveredBy()->withTrashed()->first()),
+            'delivered_by' => $this->order->delivered_by
         ];
     }
 }
