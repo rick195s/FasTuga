@@ -21,8 +21,8 @@ class OrderItemResource extends JsonResource
             "status" => $this->statusToString(),
             "price_on_purchase" => $this->price,
             "notes" => $this->notes,
-            "preparation_by" => new UserResource($this->preparationBy()->withTrashed()->first()),
-            "product" => new ProductResource($this->product()->withTrashed()->first()),
+            "preparation_by" => $this->preparation_by,
+            "product" => $this->product_id
         ];
     }
 }
