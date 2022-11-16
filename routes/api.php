@@ -16,6 +16,7 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -35,6 +36,10 @@ Route::get("/", function () {
     //return User::has('order_items')->get();
 });
 
+
+Route::get("/orders", function () {
+    return Auth::user();
+})->middleware("auth:api");
 
 Route::post("/register/driver", [RegisterDriverController::class, "store"]);
 

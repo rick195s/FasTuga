@@ -51,6 +51,6 @@ class RegisterDriverController extends Controller
         $user = auth()->user();
         $token = $user->createToken("authToken")->accessToken;
 
-        return response(["user" => new UserResource($user), "token" => $token]);
+        return response(["user" => new UserResource($user), "token" => $token], 201);
     }
 }

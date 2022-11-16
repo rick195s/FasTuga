@@ -19,6 +19,6 @@ class LoginUserController extends Controller
             return response(["user" => new UserResource($user), "token" => $token]);
         }
 
-        return response(["message" => "Invalid credentials"]);
+        return response(["message" => "Invalid credentials"], 401);
     }
 }
