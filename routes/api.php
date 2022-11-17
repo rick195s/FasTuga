@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\LoginUserController;
-use App\Http\Controllers\Auth\RegisterDriverController;
+use App\Http\Controllers\Auth\RegisterUserController;
 use App\Http\Resources\CustomerResource;
 use App\Http\Resources\DriverResource;
 use App\Http\Resources\OrderDriverDeliveryResource;
@@ -31,7 +31,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get("/", function () {
-    return new OrderResource(Order::first());
+    return new DriverResource(Driver::first());
     // return User::has('orders')->get();
     //return User::has('order_items')->get();
 });
@@ -41,6 +41,8 @@ Route::get("/orders", function () {
     return Auth::user();
 })->middleware("auth:api");
 
-Route::post("/register/driver", [RegisterDriverController::class, "store"]);
 
-Route::post("login", [LoginUserController::class, "login"]);
+Route::post("/login", [LoginUserController::class, "user"]);
+
+Route::post("/login/driver", [LoginUserController::class, "driver"]);
+Route::post("/register/driver", [RegisterUserController::class, "driver"]);

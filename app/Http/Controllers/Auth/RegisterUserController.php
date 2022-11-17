@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\RegisterDriverRequest;
 use App\Http\Resources\UserResource;
+use App\Http\Resources\DriverResource;
 use App\Models\Customer;
 use App\Models\Driver;
 use App\Models\User;
@@ -17,15 +18,13 @@ use Illuminate\Support\Facades\Hash;
 
 class RegisterDriverController extends Controller
 {
-    /**
-     * Handle an incoming registration request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     */
-    public function store(RegisterDriverRequest $request)
+    
+    public function user(RegisterDriverRequest $request)
+    {
+       
+    }
+
+    public function driver(RegisterDriverRequest $request)
     {
         $validated = $request->validated();
 
@@ -51,6 +50,6 @@ class RegisterDriverController extends Controller
         $user = auth()->user();
         $token = $user->createToken("authToken")->accessToken;
 
-        return response(["user" => new UserResource($user), "token" => $token], 201);
+        return response(["user" => new DriverResource($user), "token" => $token], 201);
     }
 }
