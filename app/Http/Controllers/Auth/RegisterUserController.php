@@ -19,10 +19,36 @@ use Illuminate\Support\Facades\Hash;
 
 class RegisterUserController extends Controller
 {
-    
+
     public function user(RegisterUserRequest $request)
     {
-       
+        $validated = $request->validated();
+
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'type' => $validated['type'],
+            'blocked' => 0
+        ]);
+
+        if ($validated['type'] == 'C') {
+            Customer::create([
+                'user_id' => $user->id,
+                'phone' => $validated['phone'],
+                'nif' => $validated['nif'],
+                'points' => 0
+            ]);
+        }
+
+        event(new Registered($user));
+
+        Auth::login($user);
+
+        $user = auth()->user();
+        $token = $user->createToken("authToken")->accessToken;
+
+        return response(["user" => new UserResource($user), "token" => $token], 201);
     }
 
     // FasTugaDriver Integration
