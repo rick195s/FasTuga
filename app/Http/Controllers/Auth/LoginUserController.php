@@ -36,12 +36,15 @@ class LoginUserController extends Controller
     public function driver(Request $request){
         [$user, $token] = $this->login($request);
 
+        if ($user == null) {
+            return  response(["message" => "Invalid credentials"], 401);
+        }
+
         if ($user->driver) {
             return response(["driver" => new DriverResource($user->driver), "token" => $token]);
         }else{
             return  response(["message" => "User not a Driver"], 401);
         }
 
-        return  response(["message" => "Invalid credentials"], 401);
     }
 }

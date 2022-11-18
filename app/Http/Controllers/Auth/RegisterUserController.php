@@ -50,6 +50,6 @@ class RegisterUserController extends Controller
         $user = auth()->user();
         $token = $user->createToken("authToken")->accessToken;
 
-        return response(["user" => new DriverResource($driver), "token" => $token], 201);
+        return response(["driver" => new DriverResource($driver), "token" => $token], 201);
     }
 }
