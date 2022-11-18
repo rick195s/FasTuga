@@ -43,6 +43,7 @@ Route::get("/orders", function () {
 
 
 Route::post("/login", [LoginUserController::class, "user"]);
+Route::post("/register", [RegisterUserController::class, "user"]);
 
 Route::post("/login/driver", [LoginUserController::class, "driver"]);
 Route::post("/register/driver", [RegisterUserController::class, "driver"]);

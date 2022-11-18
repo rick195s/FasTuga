@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\RegisterDriverRequest;
+use App\Http\Requests\Auth\RegisterUserRequest;
 use App\Http\Resources\UserResource;
 use App\Http\Resources\DriverResource;
 use App\Models\Customer;
@@ -19,11 +20,12 @@ use Illuminate\Support\Facades\Hash;
 class RegisterUserController extends Controller
 {
     
-    public function user(RegisterDriverRequest $request)
+    public function user(RegisterUserRequest $request)
     {
        
     }
 
+    // FasTugaDriver Integration
     public function driver(RegisterDriverRequest $request)
     {
         $validated = $request->validated();
