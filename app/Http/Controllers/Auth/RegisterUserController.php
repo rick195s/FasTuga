@@ -37,7 +37,7 @@ class RegisterUserController extends Controller
 
         ]);
 
-        Driver::create([
+        $driver = Driver::create([
             'user_id' => $user->id,
             'phone' => $validated['phone'],
             'license_plate' => $validated['license_plate'],
@@ -50,6 +50,6 @@ class RegisterUserController extends Controller
         $user = auth()->user();
         $token = $user->createToken("authToken")->accessToken;
 
-        return response(["user" => new DriverResource($user), "token" => $token], 201);
+        return response(["user" => new DriverResource($driver), "token" => $token], 201);
     }
 }
