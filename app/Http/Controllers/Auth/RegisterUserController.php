@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 
-class RegisterDriverController extends Controller
+class RegisterUserController extends Controller
 {
     
     public function user(RegisterDriverRequest $request)
