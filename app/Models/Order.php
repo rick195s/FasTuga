@@ -50,7 +50,6 @@ class Order extends Model
         return $this->belongsTo(Customer::class);
     }
 
-
     // relation order 1:n orderItems
     public function orderItems()
     {
@@ -67,5 +66,21 @@ class Order extends Model
     public function deliveredBy()
     {
         return $this->belongsTo(User::class, 'delivered_by', 'id');
+    }
+
+    public function statusToString()
+    {
+        switch ($this->status) {
+            case 'R':
+                return "Ready";
+            case 'D':
+                return "Delivered";
+            case 'C':
+                return "Cancelled";
+
+            case 'P':
+            default:
+                return "Preparing";
+        }
     }
 }

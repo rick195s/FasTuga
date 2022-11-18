@@ -60,8 +60,21 @@ class OrderItem extends Model
     }
 
     // relation user 1:n order_item
-    public function preparatedBy()
+    public function preparationBy()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, "preparation_by");
+    }
+
+    public function statusToString()
+    {
+        switch ($this->status) {
+            case 'P':
+                return "Preparing";
+            case 'R':
+                return "Ready";
+            case 'W':
+            default:
+                return "Waiting";
+        }
     }
 }

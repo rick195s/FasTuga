@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
+use Laravel\Passport\HasApiTokens;
 
 class User extends Authenticatable
 {
@@ -46,6 +46,23 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    public function typeToString()
+    {
+        switch ($this->type) {
+            case 'EC':
+                return "Employee Chef";
+
+            case 'ED':
+                return "Employee Delivery";
+
+            case 'EM':
+                return "Employee Manager";
+
+            case 'C':
+            default:
+                return "Customer";
+        }
+    }
 
     // check if user is customer
     public function isCustomer()
