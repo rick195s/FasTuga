@@ -7,10 +7,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\User;
 use App\Models\Customer;
+use App\Models\Driver;
 use App\Http\Resources\DriverResource;
 use App\Http\Resources\UserResource;
 use App\Http\Resources\CustomerResource;
 use App\Http\Requests\Auth\RegisterUserRequest;
+use App\Http\Requests\Auth\RegisterDriverRequest;
 use Illuminate\Support\Facades\Hash;
 
 const PASSPORT_SERVER_URL = "http://localhost";
@@ -70,6 +72,30 @@ class AuthController extends Controller
         }
 
         return response()->json(new UserResource($user), 201);
+        
+    }
+
+    public function registerDriver(RegisterDriverRequest $request)
+    {
+
+        $validated = $request->validated();
+
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'type' => 'ED',
+            'blocked' => 0,
+        ]);
+
+        $driver = Driver::create([
+            'user_id' => $user->id,
+            'phone' => $validated['phone'],
+            'license_plate' => $validated['license_plate'],
+        ]);
+
+
+        return response()->json(new DriverResource($driver), 201);
         
     }
 
