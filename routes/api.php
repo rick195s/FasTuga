@@ -46,14 +46,13 @@ Route::get("/orders", function () {
 
 // An unknown user can register himself or the manager can register other users
 Route::post("/register", [AuthController::class, "registerUser"]);
-Route::post("/register/driver", [AuthController::class, "registerDriver"]);
 
 // Just logged out users can login and register as a driver
 Route::post("/login", [AuthController::class, "login"]);
-
 
 
 Route::get("users/me", [UserController::class, "show_me"])->middleware('auth:api');
 
 // FasTugaDriver integration
 Route::get("drivers/me", [DriverController::class, "show_me"])->middleware('auth:api');
+Route::post("/register/driver", [AuthController::class, "registerDriver"]);

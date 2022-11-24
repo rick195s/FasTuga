@@ -21,15 +21,16 @@ const CLIENT_SECRET = 'IeB9DEYv6KjCTcrGI1mzrufJKmJyjgC68jjImUnE';
 
 class AuthController extends Controller
 {
-    private function passportAuthenticationData($username, $password) {
-       return [
-           'grant_type' => 'password',
-           'client_id' => CLIENT_ID,
-           'client_secret' => CLIENT_SECRET,
-           'username' => $username,
-           'password' => $password,
-           'scope' => ''
-       ];
+    private function passportAuthenticationData($username, $password)
+    {
+        return [
+            'grant_type' => 'password',
+            'client_id' => CLIENT_ID,
+            'client_secret' => CLIENT_SECRET,
+            'username' => $username,
+            'password' => $password,
+            'scope' => ''
+        ];
     }
 
     public function login(Request $request)
@@ -41,8 +42,7 @@ class AuthController extends Controller
             $errorCode = $response->getStatusCode();
             $auth_server_response = json_decode((string) $response->content(), true);
             return response()->json($auth_server_response, $errorCode);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             return response()->json('Authentication has failed!', 401);
         }
     }
@@ -67,17 +67,17 @@ class AuthController extends Controller
                 'nif' => $validated['nif'],
                 'points' => 0
             ]);
-
-            return response()->json(new CustomerResource($user->customer), 201);
         }
 
-        return response()->json(new UserResource($user), 201);
-        
+        $request->username = $validated['email'];
+        return $this->login($request);
     }
+
+
+    // FasTugaDriver integration
 
     public function registerDriver(RegisterDriverRequest $request)
     {
-
         $validated = $request->validated();
 
         $user = User::create([
@@ -88,15 +88,14 @@ class AuthController extends Controller
             'blocked' => 0,
         ]);
 
-        $driver = Driver::create([
+        Driver::create([
             'user_id' => $user->id,
             'phone' => $validated['phone'],
             'license_plate' => $validated['license_plate'],
         ]);
 
-
-        return response()->json(new DriverResource($driver), 201);
-        
+        $request->username = $validated['email'];
+        return $this->login($request);
     }
 
 
@@ -108,6 +107,4 @@ class AuthController extends Controller
         $token->delete();
         return response(['msg' => 'Token revoked'], 200);
     }
-
-    
 }
