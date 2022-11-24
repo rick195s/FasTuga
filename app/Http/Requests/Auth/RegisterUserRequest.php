@@ -41,11 +41,11 @@ class RegisterUserRequest extends FormRequest
             ],
             'phone' => [
                 Rule::requiredIf($this->type == 'C'),
-                'string', 'min:9', 'max:15', 'unique:customers'
+                'numeric', 'digits:9', 'unique:customers'
             ],
             'nif' => [
                 Rule::requiredIf($this->type == 'C'),
-                'string', 'digits:9', 'unique:customers'
+                'numeric', 'digits:9', 'unique:customers'
             ],
         ];
     }
