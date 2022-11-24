@@ -63,14 +63,4 @@ class DriverController extends Controller
     {
         //
     }
-
-    
-    public function show_me(Request $request)
-    {
-        if ($request->user()->driver) {
-            return [new DriverResource($request->user()->driver)];
-        }
-
-        return  response(["message" => "User not a Driver"], 401);
-    }
 }

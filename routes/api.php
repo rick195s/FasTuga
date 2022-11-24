@@ -51,8 +51,7 @@ Route::post("/register", [AuthController::class, "registerUser"]);
 Route::post("/login", [AuthController::class, "login"]);
 
 
-Route::get("users/me", [UserController::class, "show_me"])->middleware('auth:api');
+Route::get("/me", [UserController::class, "show_me"])->middleware('auth:api');
 
 // FasTugaDriver integration
-Route::get("drivers/me", [DriverController::class, "show_me"])->middleware('auth:api');
 Route::post("/register/driver", [AuthController::class, "registerDriver"]);
