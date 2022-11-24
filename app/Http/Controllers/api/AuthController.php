@@ -6,8 +6,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\User;
+use App\Models\Customer;
 use App\Http\Resources\DriverResource;
 use App\Http\Resources\UserResource;
+use App\Http\Resources\CustomerResource;
+use App\Http\Requests\Auth\RegisterUserRequest;
+use Illuminate\Support\Facades\Hash;
 
 const PASSPORT_SERVER_URL = "http://localhost";
 const CLIENT_ID = 2;
@@ -39,6 +43,34 @@ class AuthController extends Controller
         catch (\Exception $e) {
             return response()->json('Authentication has failed!', 401);
         }
+    }
+
+    public function registerUser(RegisterUserRequest $request)
+    {
+
+        $validated = $request->validated();
+
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'type' => $validated['type'],
+            'blocked' => 0
+        ]);
+
+        if ($validated['type'] == 'C') {
+            Customer::create([
+                'user_id' => $user->id,
+                'phone' => $validated['phone'],
+                'nif' => $validated['nif'],
+                'points' => 0
+            ]);
+
+            return response()->json(new CustomerResource($user->customer), 201);
+        }
+
+        return response()->json(new UserResource($user), 201);
+        
     }
 
 

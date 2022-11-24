@@ -51,6 +51,8 @@ Route::post("/register/driver", [AuthController::class, "registerDriver"]);
 // Just logged out users can login and register as a driver
 Route::post("/login", [AuthController::class, "login"]);
 
+
+
 Route::get("users/me", [UserController::class, "show_me"])->middleware('auth:api');
 
 // FasTugaDriver integration
