@@ -1,7 +1,8 @@
 <?php
 
-use App\Http\Controllers\Auth\LoginUserController;
-use App\Http\Controllers\Auth\RegisterUserController;
+use App\Http\Controllers\api\AuthController;
+use App\Http\Controllers\api\UserController;
+use App\Http\Controllers\api\DriverController;
 use App\Http\Resources\CustomerResource;
 use App\Http\Resources\DriverResource;
 use App\Http\Resources\OrderDriverDeliveryResource;
@@ -42,7 +43,15 @@ Route::get("/orders", function () {
 })->middleware("auth:api");
 
 
-Route::post("/login", [LoginUserController::class, "user"]);
 
-Route::post("/login/driver", [LoginUserController::class, "driver"]);
-Route::post("/register/driver", [RegisterUserController::class, "driver"]);
+// An unknown user can register himself or the manager can register other users
+Route::post("/register", [AuthController::class, "registerUser"]);
+
+// Just logged out users can login and register as a driver
+Route::post("/login", [AuthController::class, "login"]);
+
+
+Route::get("/me", [UserController::class, "show_me"])->middleware('auth:api');
+
+// FasTugaDriver integration
+Route::post("/register/driver", [AuthController::class, "registerDriver"]);
