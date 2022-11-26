@@ -40,7 +40,7 @@ Route::get("/", function () {
 });
 
 
-Route::get("/orders", [OrdersController::class, "store"]);
+Route::get("/orders", [OrdersController::class, "store"])->middleware('auth:api');
 
 
 
