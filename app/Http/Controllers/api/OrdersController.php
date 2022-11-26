@@ -5,6 +5,7 @@ namespace App\Http\Controllers\api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Order;
+use App\Models\OrderDriverDelivery;
 
 class OrdersController extends Controller
 {
@@ -18,6 +19,13 @@ class OrdersController extends Controller
         //
     }
 
+    public function ordersToDrive()
+    {
+        $ordersToDrive = OrderDriverDelivery::select("order_id")->get();
+        $orders = Order::whereIn("id",$ordersToDrive)->paginate(15);//Adicionar cáusula where (delivery_start_date == null)
+        return $orders;
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -26,8 +34,7 @@ class OrdersController extends Controller
      */
     public function store(Request $request)
     {
-        $orders = Order::paginate(15);//Adicionar cáusula where (delivery_start_date == null)
-        return $orders;
+        //
     }
 
     /**
