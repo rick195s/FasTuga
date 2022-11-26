@@ -13,6 +13,7 @@ use App\Http\Resources\UserResource;
 use App\Http\Resources\CustomerResource;
 use App\Http\Requests\Auth\RegisterUserRequest;
 use App\Http\Requests\Auth\RegisterDriverRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 const PASSPORT_SERVER_URL = "http://localhost";
@@ -35,6 +36,7 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
+        $request->username = $request->email;
         try {
             request()->request->add($this->passportAuthenticationData($request->username, $request->password));
             $request = Request::create(PASSPORT_SERVER_URL . '/oauth/token', 'POST');
@@ -47,7 +49,20 @@ class AuthController extends Controller
         }
     }
 
-    public function registerUser(RegisterUserRequest $request)
+
+
+    // FasTugaDriver Integration
+    public function loginDriver(Request $request)
+    {
+        $user = User::where('email', $request->email)->first();
+        if ($user && !$user->driver) {
+            return response()->json('User not a Driver!', 401);
+        }
+
+        return $this->login($request);
+    }
+
+    public function register(RegisterUserRequest $request)
     {
 
         $validated = $request->validated();
@@ -75,7 +90,6 @@ class AuthController extends Controller
 
 
     // FasTugaDriver integration
-
     public function registerDriver(RegisterDriverRequest $request)
     {
         $validated = $request->validated();

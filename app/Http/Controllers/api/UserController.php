@@ -70,7 +70,10 @@ class UserController extends Controller
     {
         // FasTugaDriver integration
         if ($request->user()->driver) {
-            return [new DriverResource($request->user()->driver)];
+            // removes the 'data' key from the response
+            // https://laravel.com/docs/9.x/eloquent-resources#data-wrapping
+            DriverResource::withoutWrapping();
+            return new DriverResource($request->user()->driver);
         }
 
         if ($request->user()->customer) {
