@@ -3,6 +3,7 @@
 use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\UserController;
 use App\Http\Controllers\api\DriverController;
+use App\Http\Controllers\api\OrdersController;
 use App\Http\Resources\CustomerResource;
 use App\Http\Resources\DriverResource;
 use App\Http\Resources\OrderDriverDeliveryResource;
@@ -19,6 +20,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -38,9 +40,7 @@ Route::get("/", function () {
 });
 
 
-Route::get("/orders", function () {
-    return Auth::user();
-})->middleware("auth:api");
+Route::get("/orders", [OrdersController::class, "store"]);
 
 
 
