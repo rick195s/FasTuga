@@ -54,7 +54,8 @@ class AuthController extends Controller
     // FasTugaDriver Integration
     public function loginDriver(Request $request)
     {
-        if (!User::where('email', $request->email)->first()->driver) {
+        $user = User::where('email', $request->email)->first();
+        if ($user && !$user->driver) {
             return response()->json('User not a Driver!', 401);
         }
 
