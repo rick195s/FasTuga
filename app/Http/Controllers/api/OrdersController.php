@@ -19,7 +19,7 @@ class OrdersController extends Controller
         //
     }
 
-    public function ordersToDrive()
+    public function ordersToDriver()
     {
         $ordersToDrive = OrderDriverDelivery::select("order_id")->get();
         $orders = Order::whereIn("id",$ordersToDrive)->paginate(15);//Adicionar cáusula where (delivery_start_date == null)
