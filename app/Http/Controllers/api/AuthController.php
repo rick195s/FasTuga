@@ -8,12 +8,8 @@ use Illuminate\Support\Facades\Route;
 use App\Models\User;
 use App\Models\Customer;
 use App\Models\Driver;
-use App\Http\Resources\DriverResource;
-use App\Http\Resources\UserResource;
-use App\Http\Resources\CustomerResource;
 use App\Http\Requests\Auth\RegisterUserRequest;
 use App\Http\Requests\Auth\RegisterDriverRequest;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 const PASSPORT_SERVER_URL = "http://localhost";
