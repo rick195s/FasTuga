@@ -12,18 +12,14 @@ use App\Http\Requests\Auth\RegisterUserRequest;
 use App\Http\Requests\Auth\RegisterDriverRequest;
 use Illuminate\Support\Facades\Hash;
 
-const PASSPORT_SERVER_URL = "http://localhost";
-const CLIENT_ID = 2;
-const CLIENT_SECRET = 'zurmPENE59Bz4nCO2EPFMgyk1iW58AxfiWauQsrb';
-
 class AuthController extends Controller
 {
     private function passportAuthenticationData($username, $password)
     {
         return [
             'grant_type' => 'password',
-            'client_id' => CLIENT_ID,
-            'client_secret' => CLIENT_SECRET,
+            'client_id' => env('CLIENT_ID'),
+            'client_secret' => env('CLIENT_SECRET'),
             'username' => $username,
             'password' => $password,
             'scope' => ''
@@ -35,7 +31,7 @@ class AuthController extends Controller
         $request->username = $request->email;
         try {
             request()->request->add($this->passportAuthenticationData($request->username, $request->password));
-            $request = Request::create(PASSPORT_SERVER_URL . '/oauth/token', 'POST');
+            $request = Request::create(env('PASSPORT_SERVER_URL') . '/oauth/token', 'POST');
             $response = Route::dispatch($request);
             $errorCode = $response->getStatusCode();
             $auth_server_response = json_decode((string) $response->content(), true);
