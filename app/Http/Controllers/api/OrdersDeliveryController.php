@@ -4,18 +4,24 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\OrderDriverDelivery;
 use App\Models\Order;
+use App\Http\Resources\OrderDriverDeliveryResource;
 
-class OrdersController extends Controller
+class OrdersDeliveryController extends Controller
 {
-    /**
+     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
     public function index()
     {
-        //
+        /*$ordersToDrive = OrderDriverDelivery::select("order_id")->get();
+        $orders = Order::whereIn("id",$ordersToDrive)->paginate(10);//Adicionar cáusula where (delivery_start_date == null)
+        return $orders;*/
+
+        return OrderDriverDeliveryResource::collection(OrderDriverDelivery::paginate(10));
     }
 
     /**

@@ -3,7 +3,7 @@
 use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\UserController;
 use App\Http\Controllers\api\DriverController;
-use App\Http\Controllers\api\OrdersController;
+use App\Http\Controllers\api\OrdersDeliveryController;
 use App\Http\Resources\CustomerResource;
 use App\Http\Resources\DriverResource;
 use App\Http\Resources\OrderDriverDeliveryResource;
@@ -40,7 +40,7 @@ Route::get("/", function () {
 });
 
 
-Route::get("/orders", [OrdersController::class, "ordersToDriver"])->middleware('auth:api');
+Route::get("/orders", [OrdersDeliveryController::class, "index"])->middleware('auth:api');
 
 
 // An unknown user can register himself or the manager can register other users
