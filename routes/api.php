@@ -60,5 +60,5 @@ Route::post("/register/driver", [AuthController::class, "registerDriver"]);
 Route::post("/login/driver", [AuthController::class, "loginDriver"]);
 
 Route::middleware('auth:api')->group(function () {
-    Route::put('/driver', [DriverController::class, 'update']);
+    Route::put('/drivers/{driver}', [DriverController::class, 'update']);
 });
