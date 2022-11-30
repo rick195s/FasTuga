@@ -39,4 +39,6 @@ Route::middleware('auth:api')->group(function () {
 
     Route::put('/drivers/{driver}', [DriverController::class, 'update']);
     Route::get("/orders", [OrdersController::class, "ordersToDriver"]);
+
+    Route::apiResource("users", UserController::class);
 });

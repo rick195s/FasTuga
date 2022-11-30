@@ -7,9 +7,16 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\CustomerResource;
 use App\Http\Resources\DriverResource;
 use App\Http\Resources\UserResource;
+use App\Models\User;
 
 class UserController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->authorizeResource(User::class, 'user');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -17,7 +24,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        //
+        return UserResource::collection(User::paginate(10));
     }
 
     /**
