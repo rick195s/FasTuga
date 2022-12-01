@@ -90,4 +90,9 @@ class UserPolicy
     {
         //
     }
+
+    public function toggle_blocked(User $user, User $model)
+    {
+        return $user->isManager() && $user->id !== $model->id;
+    }
 }

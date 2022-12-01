@@ -4,6 +4,8 @@ use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\UserController;
 use App\Http\Controllers\api\DriverController;
 use App\Http\Controllers\api\OrdersController;
+use App\Http\Resources\DriverResource;
+use App\Models\Driver;
 use Illuminate\Support\Facades\Route;
 
 
@@ -40,5 +42,6 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/drivers/{driver}', [DriverController::class, 'update']);
     Route::get("/orders", [OrdersController::class, "ordersToDriver"]);
 
+    Route::patch('users/{user}/toggleBlocked', [UserController::class, 'toggle_blocked'])->middleware('can:toggle_blocked,user');
     Route::apiResource("users", UserController::class);
 });

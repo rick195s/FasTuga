@@ -24,7 +24,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        return UserResource::collection(User::paginate(10));
+        return UserResource::collection(User::paginate(5));
     }
 
     /**
@@ -89,5 +89,15 @@ class UserController extends Controller
 
 
         return new UserResource($request->user());
+    }
+
+
+
+    public function toggle_blocked(Request $request, User $user)
+    {
+        $user->blocked = !$user->blocked;
+        $user->save();
+
+        return new UserResource($user);
     }
 }
