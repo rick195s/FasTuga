@@ -35,7 +35,6 @@ class RegisterUserRequest extends FormRequest
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            // enums are only available in PHP 8.1+
             'type' => [
                 'string', 'in:C,EC,ED,EM',
             ],

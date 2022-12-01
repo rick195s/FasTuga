@@ -43,5 +43,6 @@ Route::middleware('auth:api')->group(function () {
     Route::get("/orders", [OrdersController::class, "ordersToDriver"]);
 
     Route::patch('users/{user}/toggleBlocked', [UserController::class, 'toggle_blocked'])->middleware('can:toggle_blocked,user');
+    Route::post('users/{user}/photo', [UserController::class, 'update_photo'])->middleware('can:update,user');
     Route::apiResource("users", UserController::class);
 });

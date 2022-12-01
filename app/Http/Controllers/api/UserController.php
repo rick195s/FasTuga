@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\CustomerResource;
 use App\Http\Resources\DriverResource;
 use App\Http\Resources\UserResource;
@@ -56,9 +57,39 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateUserRequest $request, User $user)
     {
-        //
+        $validated = $request->validated();
+
+        $user->update($validated);
+
+        if (isset($validated['photo'])) {
+            $ext = $validated['photo']->extension();
+            $photoName = $user->id . "_" . uniqid() . '.' . $ext;
+            $validated['photo']->storeAs('public/fotos', $photoName);
+            $user->photo_url = $photoName;
+        }
+
+        $user->save();
+
+        return new UserResource($user);
+    }
+
+
+    public function update_photo(UpdateUserRequest $request, User $user)
+    {
+        $validated = $request->validated();
+
+        if (isset($validated['photo'])) {
+            $ext = $validated['photo']->extension();
+            $photoName = $user->id . "_" . uniqid() . '.' . $ext;
+            $validated['photo']->storeAs('public/fotos', $photoName);
+            $user->photo_url = $photoName;
+        }
+
+        $user->save();
+
+        return new UserResource($user);
     }
 
     /**
@@ -67,9 +98,10 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(User $user)
     {
-        //
+        $user->delete();
+        return new UserResource($user);
     }
 
 
