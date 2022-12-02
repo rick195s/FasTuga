@@ -4,11 +4,13 @@ namespace App\Http\Controllers\api;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\RegisterUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\CustomerResource;
 use App\Http\Resources\DriverResource;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -34,9 +36,9 @@ class UserController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(RegisterUserRequest $request)
     {
-        //
+        return (new AuthController)->register($request);
     }
 
     /**
@@ -61,16 +63,11 @@ class UserController extends Controller
     {
         $validated = $request->validated();
 
-        $user->update($validated);
-
-        if (isset($validated['photo'])) {
-            $ext = $validated['photo']->extension();
-            $photoName = $user->id . "_" . uniqid() . '.' . $ext;
-            $validated['photo']->storeAs('public/fotos', $photoName);
-            $user->photo_url = $photoName;
+        if (isset($validated['password'])) {
+            $validated['password'] = Hash::make($validated['password']);
         }
 
-        $user->save();
+        $user->update($validated);
 
         return new UserResource($user);
     }

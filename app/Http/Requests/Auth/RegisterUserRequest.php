@@ -16,11 +16,14 @@ class RegisterUserRequest extends FormRequest
      */
     public function authorize()
     {
-        if ($this->type == "C") {
+        $user = Auth::guard('api')->user();
+
+        // authenticated users cannot create customers
+        if ($this->type == "C" && !$user) {
             return true;
         }
 
-        $user = Auth::guard('api')->user();
+        // only managers can create employees
         return  $user && $user->isManager();
     }
 
@@ -38,6 +41,7 @@ class RegisterUserRequest extends FormRequest
             'type' => [
                 'string', 'in:C,EC,ED,EM',
             ],
+            'photo' => ['image', 'mimes:jpeg,png,jpg', 'max:2048'],
             'phone' => [
                 Rule::requiredIf($this->type == 'C'),
                 'numeric', 'digits:9', 'unique:customers'
@@ -57,9 +61,15 @@ class RegisterUserRequest extends FormRequest
     protected function prepareForValidation()
     {
         if (empty($this->type)) {
-            $this->merge([
-                'type' => 'C',
-            ]);
+            if (!Auth::guard('api')->user()) {
+                $this->merge([
+                    'type' => 'C',
+                ]);
+            } else {
+                $this->merge([
+                    'type' => 'ED',
+                ]);
+            }
         }
     }
 }

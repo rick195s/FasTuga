@@ -34,8 +34,10 @@ class UpdateUserRequest extends FormRequest
                 Rule::prohibitedIf(auth()->user()->id != $this->user->id),
             ],
             'type' => [
-                'string', 'in:C,EC,ED,EM',
-                Rule::prohibitedIf(!auth()->user()->isManager())
+                // 'C' not allowed because customers can be created only in register
+                'string', 'in:EC,ED,EM',
+                Rule::prohibitedIf(!auth()->user()->isManager() || auth()->user()->id === $this->user->id),
+
             ],
             'phone' => [
                 'numeric', 'digits:9', 'unique:customers'
@@ -62,7 +64,7 @@ class UpdateUserRequest extends FormRequest
         // before making changes
         $validator->after(function ($validator) {
             if (
-                $this->password && !Hash::check($this->old_password, $this->driver->user->password)
+                $this->password && !Hash::check($this->old_password, $this->user->password)
             ) {
                 $validator->errors()->add('old_password', 'Your old password is incorrect.');
             }

@@ -67,6 +67,15 @@ class AuthController extends Controller
             'blocked' => 0
         ]);
 
+        if (isset($validated['photo'])) {
+            $ext = $validated['photo']->extension();
+            $photoName = $user->id . "_" . uniqid() . '.' . $ext;
+            $validated['photo']->storeAs('public/fotos', $photoName);
+            $user->photo_url = $photoName;
+        }
+
+        $user->save();
+
         if ($validated['type'] == 'C') {
             Customer::create([
                 'user_id' => $user->id,
