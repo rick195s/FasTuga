@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateDriverRequest;
 use Illuminate\Http\Request;
 use App\Http\Resources\DriverResource;
-use App\Http\Resources\UserResource;
+use App\Http\Resources\OrderDriverDeliveryResource;
 use App\Models\Driver;
 use Illuminate\Support\Facades\Hash;
 
@@ -83,5 +83,10 @@ class DriverController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function orders(Driver $driver)
+    {
+        return OrderDriverDeliveryResource::collection($driver->ordersDriverDelivery()->paginate(10));
     }
 }

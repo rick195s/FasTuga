@@ -33,7 +33,7 @@ Route::middleware('auth:api')->group(function () {
 });
 
 
-// FasTugaDriver integration
+// -------------------------------------- FasTugaDriver integration
 Route::post("/register/driver", [AuthController::class, "registerDriver"]);
 Route::post("/login/driver", [AuthController::class, "loginDriver"]);
 
@@ -41,9 +41,12 @@ Route::post("/login/driver", [AuthController::class, "loginDriver"]);
 Route::middleware('auth:api')->group(function () {
 
     Route::put('/drivers/{driver}', [DriverController::class, 'update']);
-    Route::put('/drivers/{driver}/orders', [DriverController::class, 'update']);
 
-    Route::get("/orders/driver", [OrdersDeliveryController::class, "index"]);
+    // orders of a driver
+    Route::get('/drivers/{driver}/orders', [DriverController::class, 'orders']);
+
+    // CRUD orders to driver delivery
+    Route::get("/orders/drivers", [OrdersDeliveryController::class, "index"]);
 
     Route::patch('users/{user}/toggleBlocked', [UserController::class, 'toggle_blocked'])->middleware('can:toggle_blocked,user');
     Route::post('users/{user}/photo', [UserController::class, 'update_photo'])->middleware('can:update,user');

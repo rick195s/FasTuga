@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Detailed;
 
+use App\Http\Resources\DriverResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class OrderDriverDeliveryDetailedResource extends JsonResource

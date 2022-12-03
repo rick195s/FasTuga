@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources\Detailed;
 
+use App\Http\Resources\ProductResource;
+use App\Http\Resources\UserResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class OrderItemDetailedResource extends JsonResource
