@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\OrderDriverDelivery;
 use App\Models\Order;
 use App\Http\Resources\OrderDriverDeliveryResource;
+use Illuminate\Support\Facades\Http;
 
 class OrdersDeliveryController extends Controller
 {
@@ -15,13 +16,41 @@ class OrdersDeliveryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        /*$ordersToDrive = OrderDriverDelivery::select("order_id")->get();
-        $orders = Order::whereIn("id",$ordersToDrive)->paginate(10);//Adicionar cáusula where (delivery_start_date == null)
-        return $orders;*/
+        $ordersToDeliver = OrderDriverDelivery::whereNull("delivery_started_at")->paginate(10);
 
-        return OrderDriverDeliveryResource::collection(OrderDriverDelivery::paginate(10));
+        if($request->filter == 'max.5km'){
+            $ordersToDeliver = $this->selectOrdersByFilter($ordersToDeliver,5);
+        }
+        if($request->filter == 'max.10km'){
+            $ordersToDeliver = $this->selectOrdersByFilter($ordersToDeliver,10);
+        }
+        if($request->filter == 'max.15km'){
+            $ordersToDeliver = $this->selectOrdersByFilter($ordersToDeliver,15);
+        }
+        return $ordersToDeliver;
+
+
+    }
+
+    private function selectOrdersByFilter($ordersToDeliver, $filter){
+        $ordersInFilter = array();
+        $latitude = null;
+        $longitude = null;
+        foreach ($ordersToDeliver as $order) {
+            $response = Http::get('http://api.positionstack.com/v1/forward?access_key=ce376ccadaa61d0f359a19b28d856659&query='.$order->delivery_location);
+            if($response->object()->data != null){
+                $latitude = $response->object()->data[0]->latitude;
+                $longitude = $response->object()->data[0]->longitude;
+                //Calculate distance with coordinates
+                //SE order <= filtro adicionar ELSE break 
+                array_push($ordersInFilter,$order);
+            }else {
+                array_push($ordersInFilter,"Failed to fing coordinates");
+            }
+        }
+        return $ordersInFilter;
     }
 
     /**

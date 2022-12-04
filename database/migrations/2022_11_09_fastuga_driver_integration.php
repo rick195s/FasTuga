@@ -35,8 +35,8 @@ return new class extends Migration
 
             $table->integer('tax_fee');
 
-            $table->timestamp('delivery_started_at');
-            $table->timestamp('delivery_ended_at');
+            $table->timestamp('delivery_started_at')->nullable();
+            $table->timestamp('delivery_ended_at')->nullable();
 
             $table->json('custom')->nullable();
             $table->unique(['order_id']);
