@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\OrderDriverDelivery;
 use App\Models\Order;
 use App\Http\Resources\OrderDriverDeliveryResource;
+use Illuminate\Support\Facades\Http;
 
 class OrdersDeliveryController extends Controller
 {
@@ -17,58 +18,39 @@ class OrdersDeliveryController extends Controller
      */
     public function index(Request $request)
     {
-        $ordersToCollection = OrderDriverDelivery::whereNull("delivery_started_at")->paginate(10);
+        $ordersToDeliver = OrderDriverDelivery::whereNull("delivery_started_at")->paginate(10);
 
-        /*foreach ($ordersToCollection as $order) {
-            BingWebSearch($order->delivery_location)
-            if(){
-
-            }
-        }*/
-       /* if($request->filter == 'max.5km'){
-            //get destination coordinates
-            //get user coordinates
-
-            return ["5km"];
+        if($request->filter == 'max.5km'){
+            $ordersToDeliver = $this->selectOrdersByFilter($ordersToDeliver,5);
         }
         if($request->filter == 'max.10km'){
-            return ["10km"];
+            $ordersToDeliver = $this->selectOrdersByFilter($ordersToDeliver,10);
         }
         if($request->filter == 'max.15km'){
-            return ["15km"];
-        }*/
-        return OrderDriverDeliveryResource::collection($ordersToCollection);
+            $ordersToDeliver = $this->selectOrdersByFilter($ordersToDeliver,15);
+        }
+        return $ordersToDeliver;
 
 
     }
 
-    function BingWebSearch ($query) {
-        /*$url = .env('API_URL')
-        $key = .env('API_KEY')*/
-        
-        /* Prepare the HTTP request.
-         * NOTE: Use the key 'http' even if you are making an HTTPS request.
-         * See: http://php.net/manual/en/function.stream-context-create.php.
-         */
-        $headers = "Ocp-Apim-Subscription-Key: $key\r\n";
-        $options = array ('http' => array (
-                              'header' => $headers,
-                               'method' => 'GET'));
-    
-        // Perform the request and get a JSON response.
-        $context = stream_context_create($options);
-        $result = file_get_contents($url . "?q=" . urlencode($query), false, $context);
-    
-        // Extract Bing HTTP headers.
-        $headers = array();
-        foreach ($http_response_header as $k => $v) {
-            $h = explode(":", $v, 2);
-            if (isset($h[1]))
-                if (preg_match("/^BingAPIs-/", $h[0]) || preg_match("/^X-MSEdge-/", $h[0]))
-                    $headers[trim($h[0])] = trim($h[1]);
+    private function selectOrdersByFilter($ordersToDeliver, $filter){
+        $ordersInFilter = array();
+        $latitude = null;
+        $longitude = null;
+        foreach ($ordersToDeliver as $order) {
+            $response = Http::get('http://api.positionstack.com/v1/forward?access_key=ce376ccadaa61d0f359a19b28d856659&query='.$order->delivery_location);
+            if($response->object()->data != null){
+                $latitude = $response->object()->data[0]->latitude;
+                $longitude = $response->object()->data[0]->longitude;
+                //Calculate distance with coordinates
+                //SE order <= filtro adicionar ELSE break 
+                array_push($ordersInFilter,$order);
+            }else {
+                array_push($ordersInFilter,"Failed to fing coordinates");
+            }
         }
-    
-        return array($headers, $result);
+        return $ordersInFilter;
     }
 
     /**
