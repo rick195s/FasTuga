@@ -30,6 +30,8 @@ Route::post("/login", [AuthController::class, "login"]);
 Route::middleware('auth:api')->group(function () {
     Route::get("/me", [UserController::class, "show_me"]);
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    Route::apiResource('/orders', OrdersController::class);
 });
 
 
