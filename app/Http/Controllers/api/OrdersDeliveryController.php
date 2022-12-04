@@ -43,8 +43,8 @@ class OrdersDeliveryController extends Controller
     }
 
     function BingWebSearch ($query) {
-        $url = .env('API_URL')
-        $key = .env('API_KEY')
+        /*$url = .env('API_URL')
+        $key = .env('API_KEY')*/
         
         /* Prepare the HTTP request.
          * NOTE: Use the key 'http' even if you are making an HTTPS request.
