@@ -25,16 +25,14 @@ class OrdersDeliveryController extends Controller
         $ordersToDeliver = OrderDriverDelivery::whereNull("delivery_started_at")->paginate(10);
         if($request->filter != 'All'){
             $ordersToDeliver = $this->selectOrdersByFilter($ordersToDeliver,$request->filter);
-            $ordersToDeliver = $this->paginate($ordersToDeliver);
+            $ordersToDeliver = $this->paginate($ordersToDeliver,$request->input('page'));
         }
         return OrderDriverDeliveryResource::collection($ordersToDeliver);
-
-
     }
 
-    public function paginate($items, $perPage = 5, $page = null, $options = [])
+    public function paginate($items,$page, $perPage = 10, $options = [])
     {
-        $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
+        $page = $page == null ? $page : 1;
         $items = $items instanceof Collection ? $items : Collection::make($items);
         return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
     }
