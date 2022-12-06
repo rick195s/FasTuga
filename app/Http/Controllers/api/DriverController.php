@@ -87,6 +87,6 @@ class DriverController extends Controller
 
     public function orders(Driver $driver)
     {
-        return OrderDriverDeliveryResource::collection($driver->ordersDriverDelivery()->paginate(10));
+        return OrderDriverDeliveryResource::collection($driver->ordersDriverDelivery()->orderBy('delivery_ended_at', 'desc')->paginate(10));
     }
 }

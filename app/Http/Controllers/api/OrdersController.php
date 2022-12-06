@@ -22,7 +22,7 @@ class OrdersController extends Controller
      */
     public function index()
     {
-        return OrderResource::collection(Order::orderBy('created_at', 'desc')->paginate(10));
+        return OrderResource::collection(Order::orderBy('status')->paginate(10));
     }
 
     /**
@@ -60,9 +60,11 @@ class OrdersController extends Controller
             'status' => 'string|in:P,R,D,C',
         ]);
 
-        if ($validated['status'] == 'C' && $order->status != 'D' && $order->customer) {
-            $order->customer()->increment('points', $order->points_used_to_pay);
-            $order->customer()->decrement('points', $order->points_gained);
+        if ($validated['status'] == 'C' && $order->status != 'D') {
+            if ($order->customer) {
+                $order->customer()->increment('points', $order->points_used_to_pay);
+                $order->customer()->decrement('points', $order->points_gained);
+            }
             $order->status = $validated['status'];
         }
 

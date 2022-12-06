@@ -84,7 +84,7 @@ class OrdersSeeder extends Seeder
             }
             DB::table('orders')->insert($ordersDay);
 
-            $ordersAux = DB::table('orders')->select('id', 'delivered_by', 'created_at')
+            $ordersAux = DB::table('orders')->select('id', 'delivered_by', 'created_at', 'status')
                 ->where('date', $d->format('Y-m-d'))->get()->toArray();
 
             foreach ($ordersAux as $order) {
@@ -97,7 +97,7 @@ class OrdersSeeder extends Seeder
                 // if so we need to create the corresponding record
                 // in orders_driver_delivery  (FasTuga Driver Integration)
                 if (in_array($order->delivered_by, $this->driversIDs)) {
-                    $ordersDriverDelivery[] = $this->createOrdersDriverDeliveryArray($faker, $order->id, $order->created_at);
+                    $ordersDriverDelivery[] = $this->createOrdersDriverDeliveryArray($faker, $order->id, $order->created_at, $order->status);
                 }
             }
 
@@ -132,7 +132,7 @@ class OrdersSeeder extends Seeder
             $paymentType = $faker->randomElement($this->paymentTypes);
             $paymentRef = UsersSeeder::getRandomPaymentReference($faker, $paymentType);
         }
-        $status = rand(0, 40) == 1 ? 'C' : 'D';
+        $status = rand(0, 40) == 1 ? 'R' : 'D';
 
         return [
             'status' => $status,
@@ -170,11 +170,16 @@ class OrdersSeeder extends Seeder
     }
 
     // Create the orders_driver_delivery record (FasTuga Driver Integration)
-    private function createOrdersDriverDeliveryArray($faker, $id_order, $created_at)
+    private function createOrdersDriverDeliveryArray($faker, $id_order, $created_at, $order_status)
     {
 
-        $inicio = Carbon::parse($created_at)->addSeconds(rand(39600, 78000));
-        $fim = $inicio->copy()->addSeconds(rand(100, 900));
+        if ($order_status == 'R') {
+            $inicio = null;
+            $fim = null;
+        } else {
+            $inicio = Carbon::parse($created_at)->addSeconds(rand(39600, 78000));
+            $fim = $inicio->copy()->addSeconds(rand(100, 900));
+        }
 
         $tax_fee = Arr::random([2, 3, 5]);
 
@@ -184,7 +189,6 @@ class OrdersSeeder extends Seeder
             'tax_fee' => $tax_fee,
             'delivery_started_at' => $inicio,
             'delivery_ended_at' => $fim,
-
         ];
     }
 

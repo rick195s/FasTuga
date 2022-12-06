@@ -3,10 +3,9 @@
 use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\UserController;
 use App\Http\Controllers\api\DriverController;
+use App\Http\Controllers\api\OrderItemsCotroller;
 use App\Http\Controllers\api\OrdersController;
 use App\Http\Controllers\api\OrdersDeliveryController;
-use App\Http\Resources\DriverResource;
-use App\Models\Driver;
 use Illuminate\Support\Facades\Route;
 
 
@@ -30,6 +29,10 @@ Route::post("/login", [AuthController::class, "login"]);
 Route::middleware('auth:api')->group(function () {
     Route::get("/me", [UserController::class, "show_me"]);
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    // order items to be prepared from the chef
+    Route::get('/orderItems', [OrderItemsCotroller::class, 'index']);
+    Route::put('/orderItems/{order_item}', [OrderItemsCotroller::class, 'update']);
 
     Route::apiResource('/orders', OrdersController::class);
 });
