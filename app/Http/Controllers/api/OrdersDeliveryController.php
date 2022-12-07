@@ -22,10 +22,25 @@ class OrdersDeliveryController extends Controller
      */
     public function index(Request $request)
     {
+        if($request->filter == 'DESC'){
+            $ordersToDeliver = OrderDriverDelivery::whereRelation('order', 'status', '=', 'P')
+            ->orwhereRelation('order', 'status', '=', 'R')
+            ->whereNull("delivery_started_at")->orderBy('distance','desc')->paginate(10);
+
+            return OrderDriverDeliveryResource::collection($ordersToDeliver);
+        }
+        if($request->filter == 'ASC'){
+            $ordersToDeliver = OrderDriverDelivery::whereRelation('order', 'status', '=', 'P')
+            ->orwhereRelation('order', 'status', '=', 'R')
+            ->whereNull("delivery_started_at")->orderBy('distance','asc')->paginate(10);
+
+            return OrderDriverDeliveryResource::collection($ordersToDeliver);
+        }
+
         $ordersToDeliver = OrderDriverDelivery::whereRelation('order', 'status', '=', 'P')
-        ->orwhereRelation('order', 'status', '=', 'R')
-        ->whereNull("delivery_started_at")->orderBy('distance','asc')->paginate(10);
-//Adicionar if para a ordenação
+            ->orwhereRelation('order', 'status', '=', 'R')
+            ->whereNull("delivery_started_at")->paginate(10);
+
         return OrderDriverDeliveryResource::collection($ordersToDeliver);
     }
 
