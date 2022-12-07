@@ -22,69 +22,14 @@ class OrdersDeliveryController extends Controller
      */
     public function index(Request $request)
     {
-        $ordersToDeliver = OrderDriverDelivery::whereNull("delivery_started_at")->paginate(10);
-        if($request->filter != 'All'){
-            $ordersToDeliver = $this->selectOrdersByFilter($ordersToDeliver,$request->filter);
-           // $ordersToDeliver = $this->paginate($ordersToDeliver,$request->input('page'));
-        }
-        //return OrderDriverDeliveryResource::collection($ordersToDeliver);
-        return $ordersToDeliver;
-    }
-    //READY TO SORT
-
-    public function paginate($items,$page, $perPage = 10, $options = [])
-    {
-        $page = $page == null ? $page : 1;
-        $items = $items instanceof Collection ? $items : Collection::make($items);
-        return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
+        $ordersToDeliver = OrderDriverDelivery::whereRelation('order', 'status', '=', 'P')
+        ->orwhereRelation('order', 'status', '=', 'R')
+        ->whereNull("delivery_started_at")->orderBy('distance','asc')->paginate(10);
+//Adicionar if para a ordenação
+        return OrderDriverDeliveryResource::collection($ordersToDeliver);
     }
 
-    private function selectOrdersByFilter($ordersToDeliver, $filter){
-        $ordersInFilter = array();
-        $latitude = null;
-        $longitude = null;
-        $latitudeFastuga = 39.734730;
-        $longitudeFastuga = -8.820921;
-        
-        //foreach ($ordersToDeliver as $order) {
-            //$response = Http::get('http://api.positionstack.com/v1/forward?access_key=ce376ccadaa61d0f359a19b28d856659&query='.$order->delivery_location);
-            /*if($response->object()->data != null){
-                
-            }else {
-                array_push($ordersInFilter,"Failed to fing coordinates");
-            }*/
-        //}
-        /*$ordersInFilter =*/
-        return $this->orders_bubble_sort($ordersToDeliver,$latitudeFastuga, $longitudeFastuga);
-        //return $ordersInFilter;
-    }
-
-    function orders_bubble_sort($arr,$latitudeFastuga, $longitudeFastuga) {
-        $size = count($arr)-1;
-        $dists = array();
-        $i=0;
-        foreach ($arr as $order) {
-            
-            $response = Http::get('http://api.positionstack.com/v1/forward?access_key=ce376ccadaa61d0f359a19b28d856659&query='.$order->delivery_location);
-            for ($j=0; $j<$size-$i; $j++) {
-                $k = $j+1;
-                $latitudeA = Http::get('http://api.positionstack.com/v1/forward?access_key=ce376ccadaa61d0f359a19b28d856659&query='.$arr[$k]->delivery_location)->object()->data[0]->latitude;
-                $longitudeA =  Http::get('http://api.positionstack.com/v1/forward?access_key=ce376ccadaa61d0f359a19b28d856659&query='.$arr[$k]->delivery_location)->object()->data[0]->longitude;
-                $latitudeB = Http::get('http://api.positionstack.com/v1/forward?access_key=ce376ccadaa61d0f359a19b28d856659&query='.$arr[$j]->delivery_location)->object()->data[0]->latitude;
-                $longitudeB = Http::get('http://api.positionstack.com/v1/forward?access_key=ce376ccadaa61d0f359a19b28d856659&query='.$arr[$j]->delivery_location)->object()->data[0]->longitude;
-                //SE order <= filtro adicionar ELSE break 
-                //$this->distance($latitude, $longitude, $latitudeFastuga, $longitudeFastuga, "K") < $filter
-                if ($this->distance($latitudeA, $longitudeA, $latitudeFastuga, $longitudeFastuga, "K") > $this->distance($latitudeB, $longitudeB, $latitudeFastuga, $longitudeFastuga, "K")) {
-                    // Swap elements at indices: $j, $k
-                    array_push($dists,$this->distance($latitudeA, $longitudeA, $latitudeFastuga, $longitudeFastuga, "K"));
-                    //list($arr[$j], $arr[$k]) = array($arr[$k], $arr[$j]);
-                    
-                }
-            }
-            $i=$i+1;
-        }
-        return $arr;
-    }
+   
 
     function distance($lat1, $lon1, $lat2, $lon2, $unit) {
         if (($lat1 == $lat2) && ($lon1 == $lon2)) {

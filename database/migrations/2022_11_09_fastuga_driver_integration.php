@@ -39,6 +39,7 @@ return new class extends Migration
             $table->timestamp('delivery_ended_at')->nullable();
 
             $table->json('custom')->nullable();
+            $table->float('distance', 8, 2);
             $table->unique(['order_id']);
         });
     }

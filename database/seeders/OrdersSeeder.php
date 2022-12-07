@@ -7,6 +7,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class OrdersSeeder extends Seeder
 {
@@ -178,14 +179,56 @@ class OrdersSeeder extends Seeder
 
         $tax_fee = Arr::random([2, 3, 5]);
 
+        $fakerAddress = $faker->address;
+        $locationdata = Http::get('http://api.positionstack.com/v1/forward?access_key=ce376ccadaa61d0f359a19b28d856659&query='.$fakerAddress)->object();
+        if($locationdata->data != null && $locationdata->data[0] != null ){
+            $latitude = $locationdata->data[0]->latitude;
+            $longitude = $locationdata->data[0]->longitude;
+        }else{
+            $this->command->info("Is null");
+            $latitude = 39.734730;
+            $longitude = -8.820921;
+        }
+       
+        //$this->command->info("OBJ: "+$locationdata+"\n");
+        /*$object = $locationdata->object();*/
+       /* $latitude = $locationdata->latitude;
+        $this->command->info("LATITUDE-> ".$latitude);
+        $longitude =  $locationdata->longitude;*/
+        $latitudeFastuga = 39.734730;
+        $longitudeFastuga = -8.820921;
+                
         return [
             'order_id' => $id_order,
-            'delivery_location' => $faker->address,
+            'delivery_location' => $fakerAddress,
             'tax_fee' => $tax_fee,
             'delivery_started_at' => $inicio,
             'delivery_ended_at' => $fim,
+            'distance' => $this->distance($latitude, $longitude, $latitudeFastuga, $longitudeFastuga, "K")
 
         ];
+    }
+
+    function distance($lat1, $lon1, $lat2, $lon2, $unit) {
+        if (($lat1 == $lat2) && ($lon1 == $lon2)) {
+          return 0;
+        }
+        else {
+          $theta = $lon1 - $lon2;
+          $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) +  cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
+          $dist = acos($dist);
+          $dist = rad2deg($dist);
+          $miles = $dist * 60 * 1.1515;
+          $unit = strtoupper($unit);
+      
+          if ($unit == "K") {
+            return ($miles * 1.609344);
+          } else if ($unit == "N") {
+            return ($miles * 0.8684);
+          } else {
+            return $miles;
+          }
+        }
     }
 
     private function seedPoints()
