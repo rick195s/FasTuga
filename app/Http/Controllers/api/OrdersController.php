@@ -3,11 +3,18 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Detailed\OrderDetailedResource;
+use App\Http\Resources\OrderResource;
 use Illuminate\Http\Request;
 use App\Models\Order;
 
 class OrdersController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Order::class, 'order');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -15,7 +22,7 @@ class OrdersController extends Controller
      */
     public function index()
     {
-        //
+        return OrderResource::collection(Order::orderBy('status')->paginate(10));
     }
 
     /**
@@ -35,9 +42,9 @@ class OrdersController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Order $order)
     {
-        //
+        return new OrderDetailedResource($order);
     }
 
     /**
@@ -47,9 +54,22 @@ class OrdersController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Order $order)
     {
-        //
+        $validated = $request->validate([
+            'status' => 'string|in:P,R,D,C',
+        ]);
+
+        if ($validated['status'] == 'C' && $order->status != 'D') {
+            if ($order->customer) {
+                $order->customer()->increment('points', $order->points_used_to_pay);
+                $order->customer()->decrement('points', $order->points_gained);
+            }
+            $order->status = $validated['status'];
+        }
+
+        $order->save();
+        return new OrderDetailedResource($order);
     }
 
     /**
