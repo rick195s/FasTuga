@@ -22,46 +22,27 @@ class OrdersDeliveryController extends Controller
      */
     public function index(Request $request)
     {
+
+        if($request->filter == 'DESC'){
+            $ordersToDeliver = OrderDriverDelivery::whereRelation('order', 'status', '=', 'P')
+            ->orwhereRelation('order', 'status', '=', 'R')
+            ->whereNull("delivery_started_at")->orderBy('distance','desc')->paginate(10);
+
+            return OrderDriverDeliveryResource::collection($ordersToDeliver);
+        }
+        if($request->filter == 'ASC'){
+            $ordersToDeliver = OrderDriverDelivery::whereRelation('order', 'status', '=', 'P')
+            ->orwhereRelation('order', 'status', '=', 'R')
+            ->whereNull("delivery_started_at")->orderBy('distance','asc')->paginate(10);
+
+            return OrderDriverDeliveryResource::collection($ordersToDeliver);
+        }
+
         $ordersToDeliver = OrderDriverDelivery::whereRelation('order', 'status', '=', 'P')
-            ->orWhereRelation('order', 'status', '=', 'R')
+            ->orwhereRelation('order', 'status', '=', 'R')
             ->whereNull("delivery_started_at")->paginate(10);
 
-        if ($request->filter != 'All') {
-            $ordersToDeliver = $this->selectOrdersByFilter($ordersToDeliver, $request->filter);
-            $ordersToDeliver = $this->paginate($ordersToDeliver);
-        }
         return OrderDriverDeliveryResource::collection($ordersToDeliver);
-    }
-
-    public function paginate($items, $perPage = 5, $page = null, $options = [])
-    {
-        $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
-        $items = $items instanceof Collection ? $items : Collection::make($items);
-        return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
-    }
-
-    private function selectOrdersByFilter($ordersToDeliver, $filter)
-    {
-        $ordersInFilter = array();
-        $latitude = null;
-        $longitude = null;
-        $latitudeFastuga = 39.734730;
-        $longitudeFastuga = -8.820921;
-
-        foreach ($ordersToDeliver as $order) {
-            $response = Http::get('http://api.positionstack.com/v1/forward?access_key=ce376ccadaa61d0f359a19b28d856659&query=' . $order->delivery_location);
-            if ($response->object()->data != null) {
-                $latitude = $response->object()->data[0]->latitude;
-                $longitude = $response->object()->data[0]->longitude;
-                //SE order <= filtro adicionar ELSE break
-                if ($this->distance($latitude, $longitude, $latitudeFastuga, $longitudeFastuga, "K") <= $filter) {
-                    array_push($ordersInFilter, $order);
-                }
-            }/*else {
-                array_push($ordersInFilter,"Failed to fing coordinates");
-            }*/
-        }
-        return $ordersInFilter;
     }
 
     function distance($lat1, $lon1, $lat2, $lon2, $unit)
