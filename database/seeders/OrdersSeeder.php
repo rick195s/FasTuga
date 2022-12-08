@@ -79,7 +79,6 @@ class OrdersSeeder extends Seeder
             $totalOrdersDay = intval($this->avgOrdersDay[$d->dayOfWeek] + $this->avgOrdersDay[$d->dayOfWeek] * rand(-20, 20) / 100);
             $totalOrdersDay = $totalOrdersDay < 0 ? 0 : $totalOrdersDay;
             $ordersDay = [];
-            $ordersDriverDelivery = [];
             for ($num = 0; $num < $totalOrdersDay; $num++) {
                 $ordersDay[] = $this->createOrderArray($faker, $d, $num);
             }
@@ -93,19 +92,8 @@ class OrdersSeeder extends Seeder
                 $total = $this->createOrderItemsArray($faker, $allItems, $order->id);
                 DB::table('order_items')->insert($allItems);
                 //DB::update('update orders set total_price = ? where id = ?', [$total, $id]);
-
-                // Check if order was delivered by a driver
-                // if so we need to create the corresponding record
-                // in orders_driver_delivery  (FasTuga Driver Integration)
-                if (in_array($order->delivered_by, $this->driversIDs)) {
-                    $ordersDriverDelivery[] = $this->createOrdersDriverDeliveryArray($faker, $order->id, $order->created_at, $order->status);
-                }
+                $this->seedOrderDriverDelivery($faker, $order);
             }
-
-            $this->command->info("Entregas ao domicilio:  " . count($ordersDriverDelivery));
-
-            // (FasTuga Driver Integration)
-            DB::table('orders_driver_delivery')->insert($ordersDriverDelivery);
 
             $i++;
             $d->addDays(1);
@@ -170,6 +158,31 @@ class OrdersSeeder extends Seeder
         }
     }
 
+
+    // FastugaDriver
+    public function seedOrderDriverDelivery($faker, $order)
+    {
+
+        if (rand(0, 2) == 1) {
+            DB::table('orders')->update(['delivered_by' => null]);
+        }
+
+        $ordersDriverDelivery = [];
+
+
+        // Check if order was delivered by a driver
+        // if so we need to create the corresponding record
+        // in orders_driver_delivery  (FasTuga Driver Integration)
+        if (in_array($order->delivered_by, $this->driversIDs)) {
+            $ordersDriverDelivery[] = $this->createOrdersDriverDeliveryArray($faker, $order->id, $order->created_at, $order->status);
+        }
+
+
+        $this->command->info("Entregas ao domicilio:  " . count($ordersDriverDelivery));
+
+        // (FasTuga Driver Integration)
+        DB::table('orders_driver_delivery')->insert($ordersDriverDelivery);
+    }
     // Create the orders_driver_delivery record (FasTuga Driver Integration)
     private function createOrdersDriverDeliveryArray($faker, $id_order, $created_at, $order_status)
     {
@@ -185,24 +198,27 @@ class OrdersSeeder extends Seeder
         $tax_fee = Arr::random([2, 3, 5]);
 
         $fakerAddress = $faker->address;
-        $locationdata = Http::get('http://api.positionstack.com/v1/forward?access_key=ce376ccadaa61d0f359a19b28d856659&query='.$fakerAddress)->object();
-        if($locationdata->data != null && $locationdata->data[0] != null ){
-            $latitude = $locationdata->data[0]->latitude;
-            $longitude = $locationdata->data[0]->longitude;
-        }else{
+        //$locationdata = Http::get('http://api.positionstack.com/v1/forward?access_key=ce376ccadaa61d0f359a19b28d856659&query='.$fakerAddress)->object();
+        $locationdata = Http::get("https://api.mapbox.com/geocoding/v5/mapbox.places/" . $fakerAddress . ".json?access_token=" . env('MAPBOX_ACCESS_TOKEN'))
+            ->object()->features[0]->center;
+
+        if ($locationdata[0] != null && $locationdata[1] != null) {
+            $latitude = $locationdata[1];
+            $longitude = $locationdata[0];
+        } else {
             $this->command->info("Is null");
             $latitude = 39.734730;
             $longitude = -8.820921;
         }
-       
+
         //$this->command->info("OBJ: "+$locationdata+"\n");
         /*$object = $locationdata->object();*/
-       /* $latitude = $locationdata->latitude;
+        /* $latitude = $locationdata->latitude;
         $this->command->info("LATITUDE-> ".$latitude);
         $longitude =  $locationdata->longitude;*/
         $latitudeFastuga = 39.734730;
         $longitudeFastuga = -8.820921;
-                
+
         return [
             'order_id' => $id_order,
             'delivery_location' => $fakerAddress,
@@ -213,25 +229,25 @@ class OrdersSeeder extends Seeder
         ];
     }
 
-    function distance($lat1, $lon1, $lat2, $lon2, $unit) {
+    function distance($lat1, $lon1, $lat2, $lon2, $unit)
+    {
         if (($lat1 == $lat2) && ($lon1 == $lon2)) {
-          return 0;
-        }
-        else {
-          $theta = $lon1 - $lon2;
-          $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) +  cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
-          $dist = acos($dist);
-          $dist = rad2deg($dist);
-          $miles = $dist * 60 * 1.1515;
-          $unit = strtoupper($unit);
-      
-          if ($unit == "K") {
-            return ($miles * 1.609344);
-          } else if ($unit == "N") {
-            return ($miles * 0.8684);
-          } else {
-            return $miles;
-          }
+            return 0;
+        } else {
+            $theta = $lon1 - $lon2;
+            $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) +  cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
+            $dist = acos($dist);
+            $dist = rad2deg($dist);
+            $miles = $dist * 60 * 1.1515;
+            $unit = strtoupper($unit);
+
+            if ($unit == "K") {
+                return ($miles * 1.609344);
+            } else if ($unit == "N") {
+                return ($miles * 0.8684);
+            } else {
+                return $miles;
+            }
         }
     }
 

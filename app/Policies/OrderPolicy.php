@@ -53,7 +53,7 @@ class OrderPolicy
      */
     public function update(User $user, Order $order)
     {
-        return $user->isManager();
+        return $user->isManager() || $order->delivered_by == null || $order->delivered_by == $user->id;
     }
 
     /**

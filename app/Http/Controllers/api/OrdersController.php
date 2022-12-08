@@ -58,15 +58,26 @@ class OrdersController extends Controller
     {
         $validated = $request->validate([
             'status' => 'string|in:P,R,D,C',
+            'delivered_by' => 'integer|exists:drivers,user_id'
         ]);
 
-        if ($validated['status'] == 'C' && $order->status != 'D') {
+
+
+        if (
+            array_key_exists('status', $validated)
+            && $validated['status'] == 'C' && $order->status != 'D'
+        ) {
             if ($order->customer) {
                 $order->customer()->increment('points', $order->points_used_to_pay);
                 $order->customer()->decrement('points', $order->points_gained);
             }
             $order->status = $validated['status'];
         }
+
+        echo $order->delivered_by;
+
+        $order->delivered_by = array_key_exists('delivered_by', $validated)
+            ? $validated['delivered_by'] : $order->delivered_by;
 
         $order->save();
         return new OrderDetailedResource($order);

@@ -22,25 +22,19 @@ class OrdersDeliveryController extends Controller
      */
     public function index(Request $request)
     {
-
-        if($request->filter == 'DESC'){
-            $ordersToDeliver = OrderDriverDelivery::whereRelation('order', 'status', '=', 'P')
-            ->orwhereRelation('order', 'status', '=', 'R')
-            ->whereNull("delivery_started_at")->orderBy('distance','desc')->paginate(10);
-
-            return OrderDriverDeliveryResource::collection($ordersToDeliver);
-        }
-        if($request->filter == 'ASC'){
-            $ordersToDeliver = OrderDriverDelivery::whereRelation('order', 'status', '=', 'P')
-            ->orwhereRelation('order', 'status', '=', 'R')
-            ->whereNull("delivery_started_at")->orderBy('distance','asc')->paginate(10);
-
-            return OrderDriverDeliveryResource::collection($ordersToDeliver);
+        if ($request->filter != 'ASC' && $request->filter != 'DESC') {
+            $request->filter == 'ASC';
         }
 
-        $ordersToDeliver = OrderDriverDelivery::whereRelation('order', 'status', '=', 'P')
-            ->orwhereRelation('order', 'status', '=', 'R')
-            ->whereNull("delivery_started_at")->paginate(10);
+        $ordersToDeliver = OrderDriverDelivery::whereNull("delivery_started_at")
+            ->whereHas('order', function ($query) {
+                $query->whereNull('delivered_by');
+            })
+
+            ->where(function ($query) {
+                $query->whereRelation('order', 'status', '=', 'P')
+                    ->orWhereRelation('order', 'status', '=', 'R');
+            })->orderBy('distance', strtolower($request->filter))->paginate(10);
 
         return OrderDriverDeliveryResource::collection($ordersToDeliver);
     }
