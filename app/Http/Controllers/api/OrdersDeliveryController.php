@@ -7,68 +7,59 @@ use Illuminate\Http\Request;
 use App\Models\OrderDriverDelivery;
 use App\Models\Order;
 use App\Http\Resources\OrderDriverDeliveryResource;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class OrdersDeliveryController extends Controller
 {
-     /**
+
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
     {
-        $ordersToCollection = OrderDriverDelivery::whereNull("delivery_started_at")->paginate(10);
 
-        /*foreach ($ordersToCollection as $order) {
-            BingWebSearch($order->delivery_location)
-            if(){
-
-            }
-        }*/
-       /* if($request->filter == 'max.5km'){
-            //get destination coordinates
-            //get user coordinates
-
-            return ["5km"];
+        if ($request->filter != 'ASC' && $request->filter != 'DESC') {
+            $request->filter == 'ASC';
         }
-        if($request->filter == 'max.10km'){
-            return ["10km"];
-        }
-        if($request->filter == 'max.15km'){
-            return ["15km"];
-        }*/
-        return OrderDriverDeliveryResource::collection($ordersToCollection);
 
+        $ordersToDeliver = OrderDriverDelivery::whereNull("delivery_started_at")
+            ->whereHas('order', function ($query) {
+                $query->whereNull('delivered_by');
+            })
 
+            ->where(function ($query) {
+                $query->whereRelation('order', 'status', '=', 'P')
+                    ->orWhereRelation('order', 'status', '=', 'R');
+            })->orderBy('distance', strtolower($request->filter))->paginate(10);
+
+        return OrderDriverDeliveryResource::collection($ordersToDeliver);
     }
 
-    function BingWebSearch ($query) {
-        $url = .env('API_URL')
-        $key = .env('API_KEY')
-        
-        /* Prepare the HTTP request.
-         * NOTE: Use the key 'http' even if you are making an HTTPS request.
-         * See: http://php.net/manual/en/function.stream-context-create.php.
-         */
-        $headers = "Ocp-Apim-Subscription-Key: $key\r\n";
-        $options = array ('http' => array (
-                              'header' => $headers,
-                               'method' => 'GET'));
-    
-        // Perform the request and get a JSON response.
-        $context = stream_context_create($options);
-        $result = file_get_contents($url . "?q=" . urlencode($query), false, $context);
-    
-        // Extract Bing HTTP headers.
-        $headers = array();
-        foreach ($http_response_header as $k => $v) {
-            $h = explode(":", $v, 2);
-            if (isset($h[1]))
-                if (preg_match("/^BingAPIs-/", $h[0]) || preg_match("/^X-MSEdge-/", $h[0]))
-                    $headers[trim($h[0])] = trim($h[1]);
+    function distance($lat1, $lon1, $lat2, $lon2, $unit)
+    {
+        if (($lat1 == $lat2) && ($lon1 == $lon2)) {
+            return 0;
+        } else {
+            $theta = $lon1 - $lon2;
+            $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) +  cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
+            $dist = acos($dist);
+            $dist = rad2deg($dist);
+            $miles = $dist * 60 * 1.1515;
+            $unit = strtoupper($unit);
+
+            if ($unit == "K") {
+                return ($miles * 1.609344);
+            } else if ($unit == "N") {
+                return ($miles * 0.8684);
+            } else {
+                return $miles;
+            }
         }
-    
-        return array($headers, $result);
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Detailed;
 
 use App\Http\Resources\CustomerResource;
+use App\Http\Resources\OrderDriverDeliveryResource;
 use App\Http\Resources\OrderItemResource;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -30,8 +31,9 @@ class OrderDetailedResource extends JsonResource
             "payment_reference" => $this->payment_reference,
             "date" => $this->date,
             "customer" => new CustomerResource($this->customer()->withTrashed()->first()),
-            "delivery_by" => new UserResource($this->deliveredBy()->withTrashed()->first()),
-            "order_items" => OrderItemResource::collection($this->orderItems),
+            "delivery_by" => $this->delivered_by,
+            "order_items" => OrderItemDetailedResource::collection($this->orderItems),
+            "order_delivery" => new OrderDriverDeliveryResource($this->orderDriverDelivery),
         ];
     }
 }
