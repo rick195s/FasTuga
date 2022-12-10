@@ -66,31 +66,33 @@ class StatisticsController extends Controller
         //
     }
 
-    public function statistics(Driver $driver)
+    public function getOrdersDeliveredByDriver($driver)
     {
-        //starting a new collection
-        $statisticsCollection = collect([]);
-
         //getting the orders delivered by the driver
-        $ordersDelivered = DB::table('orders')
+        return DB::table('orders')
             ->where('delivered_by', $driver->user_id)
             ->where('status', 'D')
             ->count();
+    }
 
+    public function getDistinctCostumers($driver)
+    {
         //getting the distinct costumers that driver had delivered
-        $distinctCostumers =
-            DB::table('orders')
-                ->where('delivered_by', $driver->user_id)
-                ->where('status', 'D')
-                ->count(DB::raw('DISTINCT customer_id')) +
+        return DB::table('orders')
+            ->where('delivered_by', $driver->user_id)
+            ->where('status', 'D')
+            ->count(DB::raw('DISTINCT customer_id')) +
             DB::table('orders')
                 ->whereNull('customer_id')
                 ->where('delivered_by', $driver->user_id)
                 ->where('status', 'D')
                 ->count();
+    }
 
+    public function getAverageTimeToDeliver($driver)
+    {
         //getting the average time to deliver an order
-        $averageTimeToDeliver = DB::table('orders')
+        return DB::table('orders')
             ->select(
                 DB::raw(
                     'date_format(SEC_TO_TIME(AVG(TIME_TO_SEC(TIMEDIFF(updated_at,created_at)))), "%i:%s") as timediff'
@@ -99,9 +101,12 @@ class StatisticsController extends Controller
             ->where('delivered_by', $driver->user_id)
             ->where('status', 'D')
             ->get();
+    }
 
+    public function getTotalTimeDeliverings($driver)
+    {
         //getting the total time delivering
-        $totaTimeDelivering = DB::table('orders')
+        return DB::table('orders')
             ->select(
                 DB::raw(
                     'SEC_TO_TIME(SUM(TIME_TO_SEC(TIMEDIFF(updated_at,created_at))))/360 as totaltimediff'
@@ -111,6 +116,44 @@ class StatisticsController extends Controller
             ->where('status', 'D')
             ->groupBy('delivered_by')
             ->get();
+    }
+
+    public function getBalance($driver)
+    {
+        //getting the balance of the driver
+        return DB::table('orders_driver_delivery')
+            ->select('orders_driver_delivery.tax_fee')
+            ->join(
+                'orders',
+                'orders.id',
+                '=',
+                'orders_driver_delivery.order_id'
+            )
+            ->where('orders.delivered_by', $driver->user_id)
+            ->where('orders.status', 'D')
+            ->get()
+            ->sum('tax_fee');
+    }
+
+    public function statistics(Driver $driver)
+    {
+        //starting a new collection
+        $statisticsCollection = collect([]);
+
+        //getting the orders delivered by the driver
+        $ordersDelivered = $this->getOrdersDeliveredByDriver($driver);
+
+        //getting the distinct costumers that driver had delivered
+        $distinctCostumers = $this->getDistinctCostumers($driver);
+
+        //getting the average time to deliver an order
+        $averageTimeToDeliver = $this->getAverageTimeToDeliver($driver);
+
+        //getting the total time delivering
+        $totaTimeDelivering = $this->getTotalTimeDeliverings($driver);
+
+        //getting the balance of the driver
+        $balance = $this->getBalance($driver);
 
         //adding the values to the collection
         $statisticsCollection->offsetSet('orders_delivered', $ordersDelivered);
@@ -126,6 +169,7 @@ class StatisticsController extends Controller
             'distinct_costumers',
             $distinctCostumers
         );
+        $statisticsCollection->offsetSet('balance', $balance);
 
         return $statisticsCollection;
     }
