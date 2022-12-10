@@ -107,9 +107,11 @@ class OrdersDeliveryController extends Controller
 
     public function start_delivery(Request $request, OrderDriverDelivery $orderDriverDelivery)
     {
-        $this->authorize('start_delivery', $orderDriverDelivery);
-        $orderDriverDelivery->delivery_started_at = now();
-        $orderDriverDelivery->save();
+        $this->authorize('update', $orderDriverDelivery);
+        if ($orderDriverDelivery->delivery_started_at  == null) {
+            $orderDriverDelivery->delivery_started_at = now();
+            $orderDriverDelivery->save();
+        }
 
         return new OrderDriverDeliveryResource($orderDriverDelivery);
     }

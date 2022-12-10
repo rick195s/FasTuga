@@ -15,10 +15,4 @@ class OrderDriverDeliveryPolicy
         return $orderDriverDelivery->deliveredBy &&
             $user->id === $orderDriverDelivery->deliveredBy->user->id;
     }
-
-    public function start_delivery(User $user, OrderDriverDelivery $orderDriverDelivery)
-    {
-        return $this->update($user, $orderDriverDelivery) &&
-            !$orderDriverDelivery->delivery_started_at;
-    }
 }
