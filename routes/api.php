@@ -45,24 +45,16 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/drivers/{driver}', [DriverController::class, 'update']);
     // orders of a driver
     Route::get('/drivers/{driver}/orders', [DriverController::class, 'orders']);
+   
+    //Statistics
+    Route::get('drivers/{driver}/statistics', [StatisticsController::class, 'statistics']);
 
     // CRUD orders to driver delivery
-    Route::get('/orders/drivers', [OrdersDeliveryController::class, 'index']);
+    Route::get("/orders/drivers", [OrdersDeliveryController::class, "index"]);
+    Route::put("/orders/drivers/{order_driver_delivery}/start_delivery", [OrdersDeliveryController::class, "start_delivery"]);
 
-    Route::patch('users/{user}/toggleBlocked', [
-        UserController::class,
-        'toggle_blocked',
-    ])->middleware('can:toggle_blocked,user');
-    Route::post('users/{user}/photo', [
-        UserController::class,
-        'update_photo',
-    ])->middleware('can:update,user');
-
-    //Statistics
-    Route::get('drivers/{driver}/statistics', [
-        StatisticsController::class,
-        'statistics',
-    ]);
+    Route::patch('users/{user}/toggleBlocked', [UserController::class, 'toggle_blocked']);
+    Route::post('users/{user}/photo', [UserController::class, 'update_photo']);
 
     // --------------------------------------
 

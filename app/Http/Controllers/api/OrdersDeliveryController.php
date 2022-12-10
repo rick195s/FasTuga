@@ -90,9 +90,8 @@ class OrdersDeliveryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, OrderDriverDelivery $orderDriverDelivery)
     {
-        //
     }
 
     /**
@@ -104,5 +103,16 @@ class OrdersDeliveryController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function start_delivery(Request $request, OrderDriverDelivery $orderDriverDelivery)
+    {
+        $this->authorize('update', $orderDriverDelivery);
+        if ($orderDriverDelivery->delivery_started_at  == null) {
+            $orderDriverDelivery->delivery_started_at = now();
+            $orderDriverDelivery->save();
+        }
+
+        return new OrderDriverDeliveryResource($orderDriverDelivery);
     }
 }
