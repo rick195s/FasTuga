@@ -58,7 +58,9 @@ class OrdersController extends Controller
     {
         $validated = $request->validate([
             'status' => 'string|in:P,R,D,C',
-            'delivered_by' => 'integer|exists:drivers,user_id'
+            'delivered_by' => 'integer|exists:drivers,user_id',
+            'delivery_started_at' => 'nullable|date',
+            'delivery_ended_at' => 'nullable|date'
         ]);
 
 
@@ -79,6 +81,15 @@ class OrdersController extends Controller
         $order->delivered_by = array_key_exists('delivered_by', $validated)
             ? $validated['delivered_by'] : $order->delivered_by;
 
+        if(array_key_exists('delivery_started_at', $validated)){
+        $order->orderDriverDelivery->delivery_started_at = $validated['delivery_started_at'];
+        }
+        if(array_key_exists('delivery_ended_at', $validated)){
+            $order->orderDriverDelivery->delivery_ended_at = $validated['delivery_ended_at'];
+            $order->status = 'D';
+        }
+        $order->orderDriverDelivery->save();
+        echo "STARTRD AT NOW: ".$order->orderDriverDelivery->delivery_started_at;
         $order->save();
         return new OrderDetailedResource($order);
     }

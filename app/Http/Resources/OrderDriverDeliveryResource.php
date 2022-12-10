@@ -19,13 +19,16 @@ class OrderDriverDeliveryResource extends JsonResource
             'order_driver_delivery_id' => $this->id,
             'delivery_location' => $this->delivery_location,
             'tax_fee' => $this->tax_fee,
-            'delivery_started_at' => $this->delivery_started_at,
+            'delivery_started_at' => $this->orderDriverDelivery,
+            //'delivery_started_at' => $this->delivery_started_at,
             'delivery_ended_at' => $this->delivery_ended_at,
             'delivered_by' => $this->order->delivered_by,
             'id' => $this->order->id,
             'payment_type'=> $this->order->payment_type,
             'ticket_number'=> $this->order->ticket_number,
-            'distance'=> $this->distance
+            'distance'=> $this->distance,
+            
+
             //'product_type'=> $this->order->orderItems->product->type
         ];
     }

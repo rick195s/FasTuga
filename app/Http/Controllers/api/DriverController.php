@@ -37,12 +37,16 @@ class DriverController extends Controller
             $driver->user->save();
         }
 
+        if (isset($validated['balance'])) {
+            $driver->user->balance = $validated['balance'];
+            $driver->user->save();
+        }
+
         $driver->update($validated);
 
         DriverResource::withoutWrapping();
         return new DriverResource($driver);
     }
-
 
     public function orders(Driver $driver)
     {
