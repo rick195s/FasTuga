@@ -20,7 +20,6 @@ return new class extends Migration
             $table->foreign('user_id')->references('id')->on('users');
             $table->string('phone', 20);
             $table->string('license_plate', 9);
-            $table->float('balance', 6,3)->nullable();
 
             $table->json('custom')->nullable();
             $table->timestamps();
