@@ -6,8 +6,8 @@ use App\Http\Controllers\api\DriverController;
 use App\Http\Controllers\api\OrderItemsCotroller;
 use App\Http\Controllers\api\OrdersController;
 use App\Http\Controllers\api\OrdersDeliveryController;
+use App\Http\Controllers\api\StatisticsController;
 use Illuminate\Support\Facades\Route;
-
 
 /*
 |--------------------------------------------------------------------------
@@ -21,24 +21,24 @@ use Illuminate\Support\Facades\Route;
 */
 
 // An unknown user can register himself or the manager can register other users
-Route::post("/register", [AuthController::class, "register"]);
+Route::post('/register', [AuthController::class, 'register']);
 
 // Just logged out users can login and register as a driver
-Route::post("/login", [AuthController::class, "login"]);
+Route::post('/login', [AuthController::class, 'login']);
 
-Route::post("/register/driver", [AuthController::class, "registerDriver"]);
-Route::post("/login/driver", [AuthController::class, "loginDriver"]);
-
+Route::post('/register/driver', [AuthController::class, 'registerDriver']);
+Route::post('/login/driver', [AuthController::class, 'loginDriver']);
 
 Route::middleware('auth:api')->group(function () {
-
-
-    Route::get("/me", [UserController::class, "show_me"]);
+    Route::get('/me', [UserController::class, 'show_me']);
     Route::post('/logout', [AuthController::class, 'logout']);
 
     // order items to be prepared from the chef
     Route::get('/orderItems', [OrderItemsCotroller::class, 'index']);
-    Route::put('/orderItems/{order_item}', [OrderItemsCotroller::class, 'update']);
+    Route::put('/orderItems/{order_item}', [
+        OrderItemsCotroller::class,
+        'update',
+    ]);
 
     // -------------------------------------- FasTugaDriver integration
 
@@ -47,14 +47,25 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/drivers/{driver}/orders', [DriverController::class, 'orders']);
 
     // CRUD orders to driver delivery
-    Route::get("/orders/drivers", [OrdersDeliveryController::class, "index"]);
+    Route::get('/orders/drivers', [OrdersDeliveryController::class, 'index']);
 
+    Route::patch('users/{user}/toggleBlocked', [
+        UserController::class,
+        'toggle_blocked',
+    ])->middleware('can:toggle_blocked,user');
+    Route::post('users/{user}/photo', [
+        UserController::class,
+        'update_photo',
+    ])->middleware('can:update,user');
 
-    Route::patch('users/{user}/toggleBlocked', [UserController::class, 'toggle_blocked'])->middleware('can:toggle_blocked,user');
-    Route::post('users/{user}/photo', [UserController::class, 'update_photo'])->middleware('can:update,user');
+    //Statistics
+    Route::get('drivers/{driver}/statistics', [
+        StatisticsController::class,
+        'statistics',
+    ]);
 
     // --------------------------------------
 
-    Route::apiResource("users", UserController::class);
-    Route::apiResource("orders", OrdersController::class);
+    Route::apiResource('users', UserController::class);
+    Route::apiResource('orders', OrdersController::class);
 });
