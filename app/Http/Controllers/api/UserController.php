@@ -75,6 +75,7 @@ class UserController extends Controller
 
     public function update_photo(UpdateUserRequest $request, User $user)
     {
+        $this->authorize('update', $user);
         $validated = $request->validated();
 
         if (isset($validated['photo'])) {
@@ -124,6 +125,8 @@ class UserController extends Controller
 
     public function toggle_blocked(Request $request, User $user)
     {
+        $this->authorize('toggle_blocked', $user);
+
         $user->blocked = !$user->blocked;
         $user->save();
 

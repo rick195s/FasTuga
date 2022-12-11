@@ -36,12 +36,7 @@ class DriverController extends Controller
             $driver->user->photo_url = $photoName;
             $driver->user->save();
         }
-
-        if (isset($validated['balance'])) {
-            $driver->user->balance = $validated['balance'];
-            $driver->user->save();
-        }
-
+        
         $driver->update($validated);
 
         DriverResource::withoutWrapping();

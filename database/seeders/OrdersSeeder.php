@@ -87,13 +87,16 @@ class OrdersSeeder extends Seeder
             $ordersAux = DB::table('orders')->select('id', 'delivered_by', 'created_at', 'status')
                 ->where('date', $d->format('Y-m-d'))->get()->toArray();
 
+            $countOrdersDriverDelivery  = 0;
+
             foreach ($ordersAux as $order) {
                 $allItems = [];
                 $total = $this->createOrderItemsArray($faker, $allItems, $order->id);
                 DB::table('order_items')->insert($allItems);
                 //DB::update('update orders set total_price = ? where id = ?', [$total, $id]);
-                $this->seedOrderDriverDelivery($faker, $order);
+                $countOrdersDriverDelivery += $this->seedOrderDriverDelivery($faker, $order);
             }
+            $this->command->info("Entregas ao domicilio:  " . $countOrdersDriverDelivery);
 
             $i++;
             $d->addDays(1);
@@ -175,13 +178,10 @@ class OrdersSeeder extends Seeder
         // in orders_driver_delivery  (FasTuga Driver Integration)
         if (in_array($order->delivered_by, $this->driversIDs)) {
             $ordersDriverDelivery[] = $this->createOrdersDriverDeliveryArray($faker, $order->id, $order->created_at, $order->status);
+            // (FasTuga Driver Integration)
+            DB::table('orders_driver_delivery')->insert($ordersDriverDelivery);
+            return 1;
         }
-
-
-        $this->command->info("Entregas ao domicilio:  " . count($ordersDriverDelivery));
-
-        // (FasTuga Driver Integration)
-        DB::table('orders_driver_delivery')->insert($ordersDriverDelivery);
     }
     // Create the orders_driver_delivery record (FasTuga Driver Integration)
     private function createOrdersDriverDeliveryArray($faker, $id_order, $created_at, $order_status)
