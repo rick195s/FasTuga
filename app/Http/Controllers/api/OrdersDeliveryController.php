@@ -122,6 +122,8 @@ class OrdersDeliveryController extends Controller
         $this->authorize('update', $orderDriverDelivery);
         if ($orderDriverDelivery->delivery_ended_at  == null) {
             $orderDriverDelivery->delivery_ended_at = now();
+            $orderDriverDelivery->order->status = "D";
+            $orderDriverDelivery->order->save();
             $orderDriverDelivery->save();
         }
 
