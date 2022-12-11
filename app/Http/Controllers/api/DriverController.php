@@ -36,13 +36,12 @@ class DriverController extends Controller
             $driver->user->photo_url = $photoName;
             $driver->user->save();
         }
-
+        
         $driver->update($validated);
 
         DriverResource::withoutWrapping();
         return new DriverResource($driver);
     }
-
 
     public function orders(Driver $driver)
     {

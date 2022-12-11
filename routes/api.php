@@ -52,6 +52,7 @@ Route::middleware('auth:api')->group(function () {
     // CRUD orders to driver delivery
     Route::get("/orders/drivers", [OrdersDeliveryController::class, "index"]);
     Route::put("/orders/drivers/{order_driver_delivery}/start_delivery", [OrdersDeliveryController::class, "start_delivery"]);
+    Route::put("/orders/drivers/{order_driver_delivery}/end_delivery", [OrdersDeliveryController::class, "end_delivery"]);
 
     Route::patch('users/{user}/toggleBlocked', [UserController::class, 'toggle_blocked']);
     Route::post('users/{user}/photo', [UserController::class, 'update_photo']);

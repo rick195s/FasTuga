@@ -58,7 +58,7 @@ class OrdersController extends Controller
     {
         $validated = $request->validate([
             'status' => 'string|in:P,R,D,C',
-            'delivered_by' => 'integer|exists:drivers,user_id'
+            'delivered_by' => 'integer|exists:drivers,user_id',
         ]);
 
 
@@ -76,7 +76,6 @@ class OrdersController extends Controller
         if ($request->delivered_by && $order->delivered_by == null) {
             $order->delivered_by = $validated['delivered_by'];
         }
-
 
         $order->save();
         return new OrderDetailedResource($order);

@@ -182,6 +182,7 @@ class UsersSeeder extends Seeder
                 'license_plate' => $faker->regexify('[A-Z0-9]{2}-[A-Z0-9]{2}-[A-Z0-9]{2}'),
                 //'license_plate' => $faker->regexify('[\d\w]{2}[-][\d\w]{2}[-][\d\w]{2}|[\d\w]{2}[ ][\d\w]{2}[ ][\d\w]{2}'),
 
+
                 'created_at' => $user['created_at'],
                 'updated_at' => $user['updated_at'],
                 'deleted_at' => $user['deleted_at'],

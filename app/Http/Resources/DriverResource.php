@@ -22,7 +22,6 @@ class DriverResource extends JsonResource
             "driver_id" => $this->id,
             "phone" => $this->phone,
             "license_plate" => $this->license_plate,
-
         ];
     }
 }

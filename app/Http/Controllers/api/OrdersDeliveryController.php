@@ -22,6 +22,7 @@ class OrdersDeliveryController extends Controller
      */
     public function index(Request $request)
     {
+
         if ($request->filter != 'ASC' && $request->filter != 'DESC') {
             $request->filter == 'ASC';
         }
@@ -110,6 +111,19 @@ class OrdersDeliveryController extends Controller
         $this->authorize('update', $orderDriverDelivery);
         if ($orderDriverDelivery->delivery_started_at  == null) {
             $orderDriverDelivery->delivery_started_at = now();
+            $orderDriverDelivery->save();
+        }
+
+        return new OrderDriverDeliveryResource($orderDriverDelivery);
+    }
+
+    public function end_delivery(Request $request, OrderDriverDelivery $orderDriverDelivery){
+        
+        $this->authorize('update', $orderDriverDelivery);
+        if ($orderDriverDelivery->delivery_ended_at  == null) {
+            $orderDriverDelivery->delivery_ended_at = now();
+            $orderDriverDelivery->order->status = "D";
+            $orderDriverDelivery->order->save();
             $orderDriverDelivery->save();
         }
 
