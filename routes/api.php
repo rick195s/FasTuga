@@ -7,6 +7,7 @@ use App\Http\Controllers\api\OrderItemsCotroller;
 use App\Http\Controllers\api\OrdersController;
 use App\Http\Controllers\api\OrdersDeliveryController;
 use App\Http\Controllers\api\StatisticsController;
+use App\Http\Controllers\api\ProductController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -40,6 +41,9 @@ Route::middleware('auth:api')->group(function () {
         'update',
     ]);
 
+
+
+
     // -------------------------------------- FasTugaDriver integration
 
     Route::put('/drivers/{driver}', [DriverController::class, 'update']);
@@ -61,4 +65,5 @@ Route::middleware('auth:api')->group(function () {
 
     Route::apiResource('users', UserController::class);
     Route::apiResource('orders', OrdersController::class);
+    Route::apiResource('products', ProductController::class);
 });
