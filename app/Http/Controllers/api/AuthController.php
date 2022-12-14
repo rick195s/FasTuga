@@ -37,7 +37,7 @@ class AuthController extends Controller
             $auth_server_response = json_decode((string) $response->content(), true);
 
             if (User::where('email', $email)->first()->blocked) {
-                return response()->json(['message' => 'User is blocked!'], 401);
+                return response()->json(['message' => 'User is blocked!'], 403);
             }
             return response()->json($auth_server_response, $errorCode);
         } catch (\Exception $e) {
