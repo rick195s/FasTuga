@@ -3,7 +3,7 @@
 use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\UserController;
 use App\Http\Controllers\api\DriverController;
-use App\Http\Controllers\api\OrderItemsCotroller;
+use App\Http\Controllers\api\OrderItemsController;
 use App\Http\Controllers\api\OrdersController;
 use App\Http\Controllers\api\OrdersDeliveryController;
 use App\Http\Controllers\api\StatisticsController;
@@ -34,9 +34,9 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
     // order items to be prepared from the chef
-    Route::get('/orderItems', [OrderItemsCotroller::class, 'index']);
+    Route::get('/orderItems', [OrderItemsController::class, 'index']);
     Route::put('/orderItems/{order_item}', [
-        OrderItemsCotroller::class,
+        OrderItemsController::class,
         'update',
     ]);
 
@@ -45,7 +45,7 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/drivers/{driver}', [DriverController::class, 'update']);
     // orders of a driver
     Route::get('/drivers/{driver}/orders', [DriverController::class, 'orders']);
-   
+
     //Statistics
     Route::get('drivers/{driver}/statistics', [StatisticsController::class, 'statistics']);
 

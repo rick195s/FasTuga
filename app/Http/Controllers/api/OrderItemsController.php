@@ -8,7 +8,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
 
-class OrderItemsCotroller extends Controller
+class OrderItemsController extends Controller
 {
 
     /**
@@ -19,14 +19,17 @@ class OrderItemsCotroller extends Controller
     public function index()
     {
         $this->authorize('viewAny', OrderItem::class);
-        $status = ['status' => 'W', 'status' => 'P'];
-        return OrderItemDetailedResource::collection(auth()->user()->orderItems()
-            ->whereRelation('product', 'type', '=', 'hot dish')
-            ->where(function ($query) {
-                $query->where('status', 'W')
-                    ->orWhere('status', 'P');
-            })
-            ->orderBy('status', 'desc')->paginate(10));
+
+        return OrderItemDetailedResource::collection(
+            auth()->user()->orderItems()
+                ->whereRelation('product', 'type', '=', 'hot dish')
+                ->whereRelation('order', 'status', '=', 'P')
+                ->where(function ($query) {
+                    $query->where('status', 'W')
+                        ->orWhere('status', 'P');
+                })
+                ->orderBy('status', 'desc')->paginate(10)
+        );
     }
 
 
