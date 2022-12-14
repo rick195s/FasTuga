@@ -34,8 +34,8 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
     // order items to be prepared from the chef
-    Route::get('/orderItems', [OrderItemsController::class, 'index']);
-    Route::put('/orderItems/{order_item}', [
+    Route::get('/orders/items', [OrderItemsController::class, 'index']);
+    Route::put('/orders/items/{order_item}', [
         OrderItemsController::class,
         'update',
     ]);
@@ -54,10 +54,10 @@ Route::middleware('auth:api')->group(function () {
     Route::put("/orders/drivers/{order_driver_delivery}/start_delivery", [OrdersDeliveryController::class, "start_delivery"]);
     Route::put("/orders/drivers/{order_driver_delivery}/end_delivery", [OrdersDeliveryController::class, "end_delivery"]);
 
+    // --------------------------------------
+
     Route::patch('users/{user}/toggleBlocked', [UserController::class, 'toggle_blocked']);
     Route::post('users/{user}/photo', [UserController::class, 'update_photo']);
-
-    // --------------------------------------
 
     Route::apiResource('users', UserController::class);
     Route::apiResource('orders', OrdersController::class);
