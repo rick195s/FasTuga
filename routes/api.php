@@ -63,5 +63,5 @@ Route::middleware('auth:api')->group(function () {
     Route::post('users/{user}/photo', [UserController::class, 'update_photo']);
 
     Route::apiResource('users', UserController::class);
-    Route::apiResource('orders', OrdersController::class);
+    Route::apiResource('orders', OrdersController::class)->except(['destroy']);
 });

@@ -62,11 +62,15 @@ class OrdersController extends Controller
         ]);
 
 
-        if ($request->status && $order->status != 'D') {
+        if ($request->status) {
 
             if ($order->customer && $validated['status'] == 'C') {
                 $order->customer()->increment('points', $order->points_used_to_pay);
                 $order->customer()->decrement('points', $order->points_gained);
+            }
+
+            if ($validated['status'] == 'D') {
+                $order->delivered_by = auth()->user()->id;
             }
 
             $order->status = $validated['status'];
@@ -81,16 +85,6 @@ class OrdersController extends Controller
         return new OrderDetailedResource($order);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
 
     public function toDeliver(Request $request)
     {
