@@ -21,6 +21,11 @@ class OrderPolicy
         return $user->isManager();
     }
 
+    public function viewToDeliver(User $user)
+    {
+        return $user->isEmployeeDelivery();
+    }
+
     /**
      * Determine whether the user can view the model.
      *
@@ -53,7 +58,7 @@ class OrderPolicy
      */
     public function update(User $user, Order $order)
     {
-        return $user->isManager() || 
+        return $user->isManager() ||
             ($user->driver && ($order->delivered_by == null || $order->delivered_by == $user->id));
     }
 

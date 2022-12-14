@@ -91,4 +91,10 @@ class OrdersController extends Controller
     {
         //
     }
+
+    public function toDeliver(Request $request)
+    {
+        $this->authorize('viewToDeliver', Order::class);
+        return OrderResource::collection(Order::where('status', 'R')->orderBy('status')->paginate(10));
+    }
 }

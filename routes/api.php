@@ -40,6 +40,9 @@ Route::middleware('auth:api')->group(function () {
         'update',
     ]);
 
+    // orders to deliver
+    Route::get('/orders/deliver', [OrdersController::class, 'toDeliver']);
+
     // -------------------------------------- FasTugaDriver integration
 
     Route::put('/drivers/{driver}', [DriverController::class, 'update']);
