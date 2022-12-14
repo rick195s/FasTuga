@@ -6,6 +6,7 @@ use App\Http\Controllers\api\DriverController;
 use App\Http\Controllers\api\OrderItemsCotroller;
 use App\Http\Controllers\api\OrdersController;
 use App\Http\Controllers\api\OrdersDeliveryController;
+use App\Http\Controllers\api\ProductsController;
 use App\Http\Controllers\api\StatisticsController;
 use Illuminate\Support\Facades\Route;
 
@@ -29,6 +30,8 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register/driver', [AuthController::class, 'registerDriver']);
 Route::post('/login/driver', [AuthController::class, 'loginDriver']);
 
+Route::get('/products', [ProductsController::class, 'index']);
+
 Route::middleware('auth:api')->group(function () {
     Route::get('/me', [UserController::class, 'show_me']);
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -45,7 +48,7 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/drivers/{driver}', [DriverController::class, 'update']);
     // orders of a driver
     Route::get('/drivers/{driver}/orders', [DriverController::class, 'orders']);
-   
+
     //Statistics
     Route::get('drivers/{driver}/statistics', [StatisticsController::class, 'statistics']);
 
