@@ -8,63 +8,12 @@ use Illuminate\Http\Request;
 use App\Http\Resources\DriverResource;
 use App\Http\Resources\OrderDriverDeliveryResource;
 use App\Models\Driver;
+use App\Models\Order;
+use Carbon\CarbonInterval;
 use Illuminate\Support\Facades\DB;
 
 class StatisticsController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
 
     public function getOrdersDeliveredByDriver($driver)
     {
@@ -83,39 +32,50 @@ class StatisticsController extends Controller
             ->where('status', 'D')
             ->count(DB::raw('DISTINCT customer_id')) +
             DB::table('orders')
-                ->whereNull('customer_id')
-                ->where('delivered_by', $driver->user_id)
-                ->where('status', 'D')
-                ->count();
+            ->whereNull('customer_id')
+            ->where('delivered_by', $driver->user_id)
+            ->where('status', 'D')
+            ->count();
     }
 
     public function getAverageTimeToDeliver($driver)
     {
-        //getting the average time to deliver an order
-        return DB::table('orders')
+        $time = Order::where('delivered_by', $driver->user_id)
             ->select(
-                DB::raw(
-                    'date_format(SEC_TO_TIME(AVG(TIME_TO_SEC(TIMEDIFF(updated_at,created_at)))), "%i:%s") as timediff'
-                )
+                DB::raw("
+                AVG(TIMESTAMPDIFF(SECOND, orders_driver_delivery.delivery_started_at, orders_driver_delivery.delivery_ended_at))
+                AS timediff")
             )
-            ->where('delivered_by', $driver->user_id)
             ->where('status', 'D')
+            ->join('orders_driver_delivery', 'orders.id', '=', 'orders_driver_delivery.order_id')
+            ->where('orders_driver_delivery.delivery_started_at', '!=', null)
+            ->where('orders_driver_delivery.delivery_ended_at', '!=', null)
             ->get();
+        return CarbonInterval::seconds((int)$time[0]->timediff)
+            ->cascade()
+            ->forHumans();
     }
 
     public function getTotalTimeDeliverings($driver)
     {
         //getting the total time delivering
-        return DB::table('orders')
+        $time = DB::table('orders')
             ->select(
                 DB::raw(
-                    'SEC_TO_TIME(SUM(TIME_TO_SEC(TIMEDIFF(updated_at,created_at))))/360 as totaltimediff'
+                    'SUM(TIMESTAMPDIFF(SECOND, orders_driver_delivery.delivery_started_at, orders_driver_delivery.delivery_ended_at))
+                     as totaltimediff'
                 )
             )
             ->where('delivered_by', $driver->user_id)
             ->where('status', 'D')
-            ->groupBy('delivered_by')
-            ->get();
+            ->join('orders_driver_delivery', 'orders.id', '=', 'orders_driver_delivery.order_id')
+            ->where('orders_driver_delivery.delivery_started_at', '!=', null)
+            ->where('orders_driver_delivery.delivery_ended_at', '!=', null)
+            ->first();
+
+        return CarbonInterval::seconds((int)$time->totaltimediff)
+            ->cascade()
+            ->forHumans();
     }
 
     public function getBalance($driver)
@@ -159,11 +119,11 @@ class StatisticsController extends Controller
         $statisticsCollection->offsetSet('orders_delivered', $ordersDelivered);
         $statisticsCollection->offsetSet(
             'average_time_to_deliver',
-            $averageTimeToDeliver[0]->timediff
+            $averageTimeToDeliver
         );
         $statisticsCollection->offsetSet(
             'total_time_delivering',
-            (int) $totaTimeDelivering[0]->totaltimediff
+            $totaTimeDelivering
         );
         $statisticsCollection->offsetSet(
             'distinct_costumers',

@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Detailed;
 
+use App\Http\Resources\OrderResource;
 use App\Http\Resources\ProductResource;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -23,6 +24,8 @@ class OrderItemDetailedResource extends JsonResource
             "status" => $this->statusToString(),
             "price_on_purchase" => $this->price,
             "notes" => $this->notes,
+            "order_ticket_number" => $this->order()->first()->ticket_number,
+            "order_status" => $this->order()->first()->status,
             "preparation_by" => new UserResource($this->preparationBy()->withTrashed()->first()),
             "product" => new ProductResource($this->product()->withTrashed()->first()),
         ];

@@ -28,16 +28,20 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $request->username = $request->email;
+        $email = $request->email;
         try {
-            request()->request->add($this->passportAuthenticationData($request->username, $request->password));
+            request()->request->add($this->passportAuthenticationData($email, $request->password));
             $request = Request::create(env('PASSPORT_SERVER_URL') . '/oauth/token', 'POST');
             $response = Route::dispatch($request);
             $errorCode = $response->getStatusCode();
             $auth_server_response = json_decode((string) $response->content(), true);
+
+            if (User::where('email', $email)->first()->blocked) {
+                return response()->json(['message' => 'User is blocked!'], 401);
+            }
             return response()->json($auth_server_response, $errorCode);
         } catch (\Exception $e) {
-            return response()->json('Authentication has failed!', 401);
+            return response()->json(['message' => 'Authentication has failed!'], 401);
         }
     }
 
