@@ -29,6 +29,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $email = $request->email;
+
         try {
             request()->request->add($this->passportAuthenticationData($email, $request->password));
             $request = Request::create(env('PASSPORT_SERVER_URL') . '/oauth/token', 'POST');
