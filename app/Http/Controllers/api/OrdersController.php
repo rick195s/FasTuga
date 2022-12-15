@@ -39,12 +39,61 @@ class OrdersController extends Controller
     {
         $validated = $request->validated();
 
-        $body["type"] = strtolower($validated["payment_type"]);
-        $body["reference"] = $validated["default_payment_reference"];
-        $body["value"] = (float) $validated["total_paid"];
+        try {
 
-        return Http::post(env('PAYMENT_SYSTEM_URI') . 'refunds', $body);
+            $body["type"] = strtolower($validated["payment_type"]);
+            $body["reference"] = $validated["payment_reference"];
+
+            // $request->total is not received from the request, but calculated in the CreateOrderRequest class
+            $body["value"] = $validated["total"];
+
+            $response = Http::post(env('PAYMENT_SYSTEM_URI') . 'payments', $body);
+
+            if ($response->getStatusCode() == 422) {
+                throw new \Exception('Error processing order.');
+            }
+
+            $order = new Order();
+            $order->total_price =  $validated["total"];
+
+            if (auth()->user() && auth()->user()->customer) {
+                if ($request->points_used_to_pay) {
+                    $this->processCustomerPoints($validated['points_used_to_pay'], $order);
+                }
+
+                $order->customer_id = auth()->user()->customer->id;
+            }
+
+            $order->save();
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th->getMessage(),
+            ], 409);
+        }
     }
+
+    public function processCustomerPoints($points, Order $order)
+    {
+        $user = auth()->user();
+
+        if (!$user || $user->customer->points < $points) {
+            throw new \Exception('User has no enough points.');
+        }
+
+        $order->total_paid_with_points = $points / 10 * 5;
+        $order->total_paid = $order->total_price - $order->total_paid_with_points;
+
+        $user->customer->points -= $points;
+        $order->points_used_to_pay = $points;
+
+        $order->points_gained = (int) floor($order->total_price / 10);
+
+        $user->customer->points += $order->points_gained;
+
+        $user->customer->save();
+    }
+
+
 
     /**
      * Display the specified resource.
@@ -80,7 +129,7 @@ class OrdersController extends Controller
                 } catch (\Throwable $th) {
                     return response()->json([
                         'message' => 'Error while trying to refund the customer',
-                    ], 401);
+                    ], 422);
                 }
             }
 
