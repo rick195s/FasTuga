@@ -31,6 +31,7 @@ Route::post('/register/driver', [AuthController::class, 'registerDriver']);
 Route::post('/login/driver', [AuthController::class, 'loginDriver']);
 
 Route::get('/products', [ProductsController::class, 'index']);
+Route::get('/products/type', [ProductsController::class, 'productType']);
 
 Route::middleware('auth:api')->group(function () {
     Route::get('/me', [UserController::class, 'show_me']);

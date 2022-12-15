@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\DB;
 
 class ProductsController extends Controller
 {
@@ -18,6 +18,11 @@ class ProductsController extends Controller
     public function index()
     {
         return ProductResource::collection(Product::get());
+    }
+
+    public function productType()
+    {
+        return Product::select('type')->distinct()->get();
     }
 
     /**
