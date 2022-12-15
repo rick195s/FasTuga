@@ -44,9 +44,6 @@ class OrdersController extends Controller
         $validated = $request->validated();
 
         try {
-
-
-
             $body["type"] = strtolower($validated["payment_type"]);
             $body["reference"] = $validated["payment_reference"];
 
@@ -97,7 +94,7 @@ class OrdersController extends Controller
     public function createOrderItems($items, $order_id)
     {
         $quantities = collect($items)->pluck('quantity', 'product_id');
-
+        $notes = collect($items)->pluck('notes', 'product_id');
         $products = Product::select('price', 'type', 'id')->whereIn('id', $quantities->keys())->get();
 
         $order_items = [];
@@ -112,6 +109,7 @@ class OrdersController extends Controller
                     'status' => $this->getOrderItemStatus($product->type),
                     'price' => $product->price,
                     'preparation_by' => $this->getPreparationBy($product->type),
+                    'notes' => $notes->get($product->id),
                 ];
                 $order_local_number++;
             }
