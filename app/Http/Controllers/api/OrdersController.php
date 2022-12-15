@@ -41,6 +41,7 @@ class OrdersController extends Controller
 
         try {
 
+
             $body["type"] = strtolower($validated["payment_type"]);
             $body["reference"] = $validated["payment_reference"];
 
@@ -54,7 +55,9 @@ class OrdersController extends Controller
             }
 
             $order = new Order();
+
             $order->total_price =  $validated["total"];
+            $order->date = now();
 
             if (auth()->user() && auth()->user()->customer) {
                 if ($request->points_used_to_pay) {
@@ -64,12 +67,25 @@ class OrdersController extends Controller
                 $order->customer_id = auth()->user()->customer->id;
             }
 
+            $order->ticket_number = $this->getTicketNumber();
             $order->save();
         } catch (\Throwable $th) {
             return response()->json([
                 'message' => $th->getMessage(),
             ], 409);
         }
+    }
+
+    public function getTicketNumber()
+    {
+
+        $taken_tickets = Order::whereIn('status', ['P', 'R'])->pluck('ticket_number');
+        if ($taken_tickets->count() >= 99) {
+            throw new \Exception('The live limit of 99 orders has been reached.');
+        }
+
+        $available_tickets = collect()->range(1, 99)->diff($taken_tickets);
+        return $available_tickets->first();
     }
 
     public function processCustomerPoints($points, Order $order)
