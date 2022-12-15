@@ -31,9 +31,9 @@ class CreateOrderRequest extends FormRequest
             "points_used_to_pay" => "multiple_of:10",
             "items" => "required|array",
             "items.*.product_id" => "required|exists:products,id",
-            "items.*.quantity" => "required|integer|min:1|max:100",
+            "items.*.quantity" => "required|integer|min:1|max:50",
+            "items.*.notes" => "string|max:200",
             "total" => "prohibited",
-
         ];
     }
 
