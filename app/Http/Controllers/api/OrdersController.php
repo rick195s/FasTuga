@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CreateOrderRequest;
 use App\Http\Resources\Detailed\OrderDetailedResource;
 use App\Http\Resources\OrderResource;
 use Illuminate\Http\Request;
@@ -13,7 +14,9 @@ class OrdersController extends Controller
 {
     public function __construct()
     {
-        $this->authorizeResource(Order::class, 'order');
+        $this->authorizeResource(Order::class, 'order', [
+            'except' => ['store']
+        ]);
     }
 
     /**
@@ -32,8 +35,15 @@ class OrdersController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CreateOrderRequest $request)
     {
+        $validated = $request->validated();
+
+        $body["type"] = strtolower($validated["payment_type"]);
+        $body["reference"] = $validated["default_payment_reference"];
+        $body["value"] = (float) $validated["total_paid"];
+
+        return Http::post(env('PAYMENT_SYSTEM_URI') . 'refunds', $body);
     }
 
     /**
@@ -66,17 +76,7 @@ class OrdersController extends Controller
 
             if ($order->customer && $validated['status'] == 'C') {
                 try {
-                    $body["type"] = strtolower($order->customer->default_payment_type);
-                    $body["reference"] = $order->customer->default_payment_reference;
-                    $body["value"] = (float) $order->total_paid;
-
-                    $response = Http::post(env('PAYMENT_SYSTEM_URI') . 'refunds', $body);
-
-                    if ($response->getStatusCode() == 422) {
-                        throw new \Exception();
-                    }
-                    $order->customer()->increment('points', $order->points_used_to_pay);
-                    $order->customer()->decrement('points', $order->points_gained);
+                    $this->refund($order);
                 } catch (\Throwable $th) {
                     return response()->json([
                         'message' => 'Error while trying to refund the customer',
@@ -98,6 +98,22 @@ class OrdersController extends Controller
 
         $order->save();
         return new OrderDetailedResource($order);
+    }
+
+    public function refund(Order $order)
+    {
+        $body["type"] = strtolower($order->customer->default_payment_type);
+        $body["reference"] = $order->customer->default_payment_reference;
+        $body["value"] = (float) $order->total_paid;
+
+        $response = Http::post(env('PAYMENT_SYSTEM_URI') . 'refunds', $body);
+
+        if ($response->getStatusCode() == 422) {
+            throw new \Exception();
+        } else {
+            $order->customer()->increment('points', $order->points_used_to_pay);
+            $order->customer()->decrement('points', $order->points_gained);
+        }
     }
 
 
