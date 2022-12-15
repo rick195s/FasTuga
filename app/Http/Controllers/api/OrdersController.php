@@ -70,8 +70,11 @@ class OrdersController extends Controller
                     $body["reference"] = $order->customer->default_payment_reference;
                     $body["value"] = (float) $order->total_paid;
 
-                    Http::post(env('PAYMENT_SYSTEM_URI') . 'refunds', $body);
+                    $response = Http::post(env('PAYMENT_SYSTEM_URI') . 'refunds', $body);
 
+                    if ($response->getStatusCode() == 422) {
+                        throw new \Exception();
+                    }
                     $order->customer()->increment('points', $order->points_used_to_pay);
                     $order->customer()->decrement('points', $order->points_gained);
                 } catch (\Throwable $th) {
