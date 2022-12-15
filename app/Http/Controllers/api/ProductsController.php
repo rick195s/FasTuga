@@ -15,9 +15,19 @@ class ProductsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return ProductResource::collection(Product::get());
+        $getAllProducts = ProductResource::collection(Product::get());
+
+        if ($request->filter == 'all') {
+            return $getAllProducts;
+        } else {
+            if ($request->filter != 'all' && $request->filter != 'drink' && $request->filter != 'dessert' && $request->filter != 'hot dish' && $request->filter != 'cold dish') {
+                return $getAllProducts;
+            } else {
+                return ProductResource::collection(Product::where('type', $request->filter)->get());
+            }
+        }
     }
 
     public function productType()
