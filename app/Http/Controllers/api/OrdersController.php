@@ -7,6 +7,7 @@ use App\Http\Resources\Detailed\OrderDetailedResource;
 use App\Http\Resources\OrderResource;
 use Illuminate\Http\Request;
 use App\Models\Order;
+use Illuminate\Support\Facades\Http;
 
 class OrdersController extends Controller
 {
@@ -64,8 +65,20 @@ class OrdersController extends Controller
         if ($request->status) {
 
             if ($order->customer && $validated['status'] == 'C') {
-                $order->customer()->increment('points', $order->points_used_to_pay);
-                $order->customer()->decrement('points', $order->points_gained);
+                try {
+                    $body["type"] = strtolower($order->customer->default_payment_type);
+                    $body["reference"] = $order->customer->default_payment_reference;
+                    $body["value"] = (float) $order->total_paid;
+
+                    Http::post(env('PAYMENT_SYSTEM_URI') . 'refunds', $body);
+
+                    $order->customer()->increment('points', $order->points_used_to_pay);
+                    $order->customer()->decrement('points', $order->points_gained);
+                } catch (\Throwable $th) {
+                    return response()->json([
+                        'message' => 'Error while trying to refund the customer',
+                    ], 401);
+                }
             }
 
             if ($validated['status'] == 'D') {
