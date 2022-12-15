@@ -66,6 +66,10 @@ Route::middleware('auth:api')->group(function () {
     Route::patch('users/{user}/toggleBlocked', [UserController::class, 'toggle_blocked']);
     Route::post('users/{user}/photo', [UserController::class, 'update_photo']);
 
+    //--------------------------------------
+
+    Route::post('products/{product}/photo', [ProductsController::class, 'update_photo']);
+
     Route::apiResource('users', UserController::class);
     Route::apiResource('products', ProductsController::class);
     Route::apiResource('orders', OrdersController::class)->except(['destroy']);

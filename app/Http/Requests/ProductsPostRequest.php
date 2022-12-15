@@ -26,9 +26,9 @@ class ProductsPostRequest extends FormRequest
         return [
             'name' => 'required|string',
             'type' => 'required|string',
-            'description' => 'required|string',
+            'description' => 'required|string|max:255',
             'photo' => ['image', 'mimes:jpeg,png,jpg', 'max:2048'],
-            'price' => 'required',
+            'price' => 'required|numeric',
         ];
     }
 }

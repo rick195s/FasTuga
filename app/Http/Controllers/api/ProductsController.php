@@ -75,9 +75,38 @@ class ProductsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Product $product)
     {
-        //
+        //$this->authorize('update', $product);
+        $validated = $request->validate([
+            'name' => 'string',
+            'type' => 'string',
+            'description' => 'string|max:255',
+            'price' => 'numeric']
+        );
+
+        $product->update($validated);
+
+        return new ProductResource($product);
+    }
+
+    public function update_photo(Request $request, Product $product)
+    {
+
+        $validated = $request->validate([
+            'photo' => ['image', 'mimes:jpeg,png,jpg', 'max:2048'],
+        ]);
+
+        if (isset($validated['photo'])) {
+            $ext = $validated['photo']->extension();
+            $photoName = $product->id . "_" . uniqid() . '.' . $ext;
+            $validated['photo']->storeAs('public/products', $photoName);
+            $product->photo_url = $photoName;
+        }
+
+        $product->save();
+
+        return new ProductResource($product);
     }
 
     /**
@@ -86,8 +115,9 @@ class ProductsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Product $product)
     {
-        //
+        $product->delete();
+        return new ProductResource($product);
     }
 }
