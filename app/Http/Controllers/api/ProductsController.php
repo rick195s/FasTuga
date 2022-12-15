@@ -7,6 +7,7 @@ use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\Requests\ProductsPostRequest;
 
 class ProductsController extends Controller
 {
@@ -17,7 +18,7 @@ class ProductsController extends Controller
      */
     public function index()
     {
-        return ProductResource::collection(Product::get());
+        return ProductResource::collection(Product::orderBy('name')->get());
     }
 
     public function productType()
@@ -31,9 +32,29 @@ class ProductsController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(ProductsPostRequest $request)
     {
-        //
+        $validated = $request->validated();
+
+        $product = Product::create(
+            [
+            'name' => $validated['name'],
+            'type' => $validated['type'],
+            'description' => $validated['description'],
+            'photo_url' => $validated['photo'],
+            'price' => $validated['price']
+            ]
+        );
+
+        if (isset($validated['photo'])) {
+            $ext = $validated['photo']->extension();
+            $photoName = $product->id . "_" . uniqid() . '.' . $ext;
+            $validated['photo']->storeAs('public/products', $photoName);
+            $product->photo_url = $photoName;
+        }
+
+        $product->save();
+        return new ProductResource($product);
     }
 
     /**
