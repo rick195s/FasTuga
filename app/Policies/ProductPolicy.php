@@ -65,7 +65,7 @@ class ProductPolicy
      */
     public function delete(User $user, Product $product)
     {
-        //
+        return true;
     }
 
     /**
@@ -89,6 +89,11 @@ class ProductPolicy
      */
     public function forceDelete(User $user, Product $product)
     {
-        //
+        return true;
+    }
+
+    public function softDelete(User $user)
+    {
+        return true;
     }
 }

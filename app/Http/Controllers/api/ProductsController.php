@@ -8,6 +8,8 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\ProductsPostRequest;
+use App\Http\Requests\UpdateProductRequest;
+use Illuminate\Support\Facades\Auth;
 
 class ProductsController extends Controller
 {
@@ -18,6 +20,7 @@ class ProductsController extends Controller
      */
     public function index()
     {
+        $this->authorize('viewAny',Auth::user());
         return ProductResource::collection(Product::orderBy('name')->get());
     }
 
@@ -34,6 +37,8 @@ class ProductsController extends Controller
      */
     public function store(ProductsPostRequest $request)
     {
+        $this->authorize('create', Auth::user());
+
         $validated = $request->validated();
 
         $product = Product::create(
@@ -75,15 +80,12 @@ class ProductsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Product $product)
+    public function update(UpdateProductRequest $request, Product $product)
     {
-        //$this->authorize('update', $product);
-        $validated = $request->validate([
-            'name' => 'string',
-            'type' => 'string',
-            'description' => 'string|max:255',
-            'price' => 'numeric']
-        );
+        $this->authorize('update', Auth::user(),$product);
+
+        $validated = $request->validated();
+
 
         $product->update($validated);
 
