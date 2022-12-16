@@ -20,7 +20,6 @@ class ProductsController extends Controller
      */
     public function index()
     {
-        $this->authorize('viewAny', Product::class);
         return ProductResource::collection(Product::orderBy('name')->get());
     }
 
