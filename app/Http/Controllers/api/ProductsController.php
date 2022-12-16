@@ -78,13 +78,11 @@ class ProductsController extends Controller
         return new ProductResource($product);
     }
 
-    public function update_photo(Request $request, Product $product)
+    public function update_photo(UpdateProductRequest $request, Product $product)
     {
         $this->authorize('update', $product);
 
-        $validated = $request->validate([
-            'photo' => ['image', 'mimes:jpeg,png,jpg', 'max:2048'],
-        ]);
+        $validated = $request->validated();
 
         if (isset($validated['photo'])) {
             $ext = $validated['photo']->extension();
