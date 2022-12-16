@@ -20,7 +20,7 @@ class ProductsController extends Controller
      */
     public function index()
     {
-        $this->authorize('viewAny', Auth::user());
+        $this->authorize('viewAny', Product::class);
         return ProductResource::collection(Product::orderBy('name')->get());
     }
 
@@ -37,28 +37,25 @@ class ProductsController extends Controller
      */
     public function store(ProductsPostRequest $request)
     {
-        $this->authorize('create', Auth::user());
+        $this->authorize('create', Product::class);
 
         $validated = $request->validated();
+
+        $ext = $validated['photo']->extension();
+        $photoName =  uniqid() . '.' . $ext;
+        $validated['photo']->storeAs('public/products', $photoName);
 
         $product = Product::create(
             [
                 'name' => $validated['name'],
                 'type' => $validated['type'],
                 'description' => $validated['description'],
-                'photo_url' => $validated['photo'],
-                'price' => number_format((float) $validated['price'], 2, '.', '')
+                'price' => number_format((float) $validated['price'], 2, '.', ''),
+                'photo_url' => $photoName,
+
             ]
         );
 
-        if (isset($validated['photo'])) {
-            $ext = $validated['photo']->extension();
-            $photoName = $product->id . "_" . uniqid() . '.' . $ext;
-            $validated['photo']->storeAs('public/products', $photoName);
-            $product->photo_url = $photoName;
-        }
-
-        $product->save();
         return new ProductResource($product);
     }
 
@@ -82,10 +79,9 @@ class ProductsController extends Controller
      */
     public function update(UpdateProductRequest $request, Product $product)
     {
-        $this->authorize('update', Auth::user(), $product);
+        $this->authorize('update', $product);
 
         $validated = $request->validated();
-
 
         $product->update($validated);
 
@@ -94,6 +90,7 @@ class ProductsController extends Controller
 
     public function update_photo(Request $request, Product $product)
     {
+        $this->authorize('update', $product);
 
         $validated = $request->validate([
             'photo' => ['image', 'mimes:jpeg,png,jpg', 'max:2048'],
@@ -119,6 +116,7 @@ class ProductsController extends Controller
      */
     public function destroy(Product $product)
     {
+        $this->authorize('delete', $product);
         $product->delete();
         return new ProductResource($product);
     }

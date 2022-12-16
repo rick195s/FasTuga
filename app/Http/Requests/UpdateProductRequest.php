@@ -24,10 +24,11 @@ class UpdateProductRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'string',
-            'type' => 'string',
+            'name' => 'string|unique:products,name|max:50',
+            'type' => 'string|in:hot dish,cold dish,drink, dessert',
             'description' => 'string|max:255',
-            'price' => 'numeric'
+            'photo' => ['image', 'mimes:jpeg,png,jpg', 'max:2048'],
+            'price' => 'numeric',
         ];
     }
 }
