@@ -33,6 +33,8 @@ Route::post('/login/driver', [AuthController::class, 'loginDriver']);
 Route::get('/products', [ProductsController::class, 'index']);
 Route::get('/products/type', [ProductsController::class, 'productType']);
 
+Route::post('/orders', [OrdersController::class, 'store']);
+
 Route::middleware('auth:api')->group(function () {
     Route::get('/me', [UserController::class, 'show_me']);
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -71,6 +73,9 @@ Route::middleware('auth:api')->group(function () {
     Route::post('products/{product}/photo', [ProductsController::class, 'update_photo']);
 
     Route::apiResource('users', UserController::class);
+
     Route::apiResource('products', ProductsController::class)->except(['index', 'show']);
-    Route::apiResource('orders', OrdersController::class)->except(['destroy']);
+
+    Route::apiResource('orders', OrdersController::class)->except(['destroy', 'store']);
+
 });
