@@ -41,7 +41,7 @@ class ProductPolicy
      */
     public function create(User $user)
     {
-        return $this->user()->type == 'EM';
+        return $user->isManager();
     }
 
     /**
@@ -53,7 +53,7 @@ class ProductPolicy
      */
     public function update(User $user, Product $product)
     {
-        return $this->user()->type == 'EM';
+        return $user->isManager();
     }
 
     /**
@@ -65,7 +65,7 @@ class ProductPolicy
      */
     public function delete(User $user, Product $product)
     {
-        return true;
+        return $user->isManager();
     }
 
     /**
@@ -89,11 +89,11 @@ class ProductPolicy
      */
     public function forceDelete(User $user, Product $product)
     {
-        return true;
+        return $user->isManager();
     }
 
     public function softDelete(User $user)
     {
-        return true;
+        return $user->isManager();
     }
 }
