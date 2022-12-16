@@ -21,17 +21,6 @@ class ProductPolicy
         return true;
     }
 
-    /**
-     * Determine whether the user can view the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function view(User $user, Product $product)
-    {
-        //
-    }
 
     /**
      * Determine whether the user can create models.
