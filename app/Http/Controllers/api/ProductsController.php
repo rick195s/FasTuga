@@ -20,7 +20,7 @@ class ProductsController extends Controller
      */
     public function index()
     {
-        $this->authorize('viewAny',Auth::user());
+        $this->authorize('viewAny', Auth::user());
         return ProductResource::collection(Product::orderBy('name')->get());
     }
 
@@ -43,11 +43,11 @@ class ProductsController extends Controller
 
         $product = Product::create(
             [
-            'name' => $validated['name'],
-            'type' => $validated['type'],
-            'description' => $validated['description'],
-            'photo_url' => $validated['photo'],
-            'price' => $validated['price']
+                'name' => $validated['name'],
+                'type' => $validated['type'],
+                'description' => $validated['description'],
+                'photo_url' => $validated['photo'],
+                'price' => number_format((float) $validated['price'], 2, '.', '')
             ]
         );
 
@@ -82,7 +82,7 @@ class ProductsController extends Controller
      */
     public function update(UpdateProductRequest $request, Product $product)
     {
-        $this->authorize('update', Auth::user(),$product);
+        $this->authorize('update', Auth::user(), $product);
 
         $validated = $request->validated();
 
