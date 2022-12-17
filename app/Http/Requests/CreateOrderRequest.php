@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\Product;
+use App\Services\Payment;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
 
@@ -53,61 +54,11 @@ class CreateOrderRequest extends FormRequest
                 'total' => $this->getTotal(),
             ]);
 
-            switch (strtoupper($this->payment_type)) {
-                case 'MBWAY':
-                    $this->validateMBWAY($validator);
-                    break;
-                case 'PAYPAL':
-                    $this->validatePAYPAL($validator);
-                    break;
-                case 'VISA':
-                    $this->validateVISA($validator);
-                    break;
-            }
+            (new Payment($validator, $this->payment_type, $this->payment_reference, $this->total))
+                ->validatePayment();
         });
     }
 
-    public function validateMBWAY($validator)
-    {
-        if (
-            Str::length(trim($this->payment_reference)) != 9 ||
-            !Str::startsWith($this->payment_reference, '9')
-        ) {
-            $validator->errors()->add('payment_reference', 'Payment reference must have length 9 and start with "9"');
-        };
-
-        if ($this->total > 10) {
-            $validator->errors()->add('payment_type', 'Payment type MBWAY has a maximum limit of 10€');
-        }
-    }
-
-    public function validatePAYPAL($validator)
-    {
-        if (
-            !$validator->validateEmail("payment_reference", $this->payment_reference, [])
-            || !Str::endsWith($this->payment_reference, ['.com', '.pt'])
-        ) {
-            $validator->errors()->add('payment_reference', 'Payment reference must be email or end with ".com" or ".pt"');
-        };
-
-        if ($this->total > 50) {
-            $validator->errors()->add('payment_type', 'Payment type PAYPAL has a maximum limit of 50€');
-        }
-    }
-
-    public function validateVISA($validator)
-    {
-        if (
-            Str::length(trim($this->payment_reference)) != 16 ||
-            !Str::startsWith($this->payment_reference, '4')
-        ) {
-            $validator->errors()->add('payment_reference', 'Payment reference must have length 16 and start with "4"');
-        };
-
-        if ($this->total > 200) {
-            $validator->errors()->add('payment_type', 'Payment type VISA has a maximum limit of 200€');
-        }
-    }
 
     public function getTotal()
     {

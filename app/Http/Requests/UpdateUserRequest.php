@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Services\Payment;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -46,8 +47,8 @@ class UpdateUserRequest extends FormRequest
                 'numeric', 'digits:9', 'unique:customers,nif,' . $this->user->customer?->id
             ],
             'photo' => ['image', 'mimes:jpeg,png,jpg', 'max:2048'],
-            'default_payment_type' => 'required_if:default_payment_id,true|string|in:VISA,PAYPAL,MBWAY',
-            'default_payment_id' => 'required_if:default_payment_type,true|string|max:50'
+            'default_payment_type' => 'required_if:default_payment_reference,true|string|in:VISA,PAYPAL,MBWAY',
+            'default_payment_reference' => 'required_if:default_payment_type,true|string|max:50'
         ];
     }
 
@@ -67,6 +68,10 @@ class UpdateUserRequest extends FormRequest
                 $this->password && !Hash::check($this->old_password, $this->user->password)
             ) {
                 $validator->errors()->add('old_password', 'Your old password is incorrect.');
+            }
+
+            if ($this->default_payment_type) {
+                (new Payment($validator, $this->default_payment_type, $this->default_payment_reference))->validatePayment();
             }
         });
     }

@@ -24,7 +24,7 @@ class CustomerResource extends JsonResource
             "points" => $this->points,
             "nif" => $this->nif,
             "default_payment_type" => $this->default_payment_type,
-            "default_payment_id" => $this->defaultPaymentId(),
+            "default_payment_reference" => $this->default_payment_reference,
         ];
     }
 }
