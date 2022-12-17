@@ -28,7 +28,7 @@ class UpdateProductRequest extends FormRequest
             'type' => 'string|in:hot dish,cold dish,drink, dessert',
             'description' => 'string|max:255',
             'photo' => ['image', 'mimes:jpeg,png,jpg', 'max:2048'],
-            'price' => 'numeric',
+            'price' => 'numeric|gt:0',
         ];
     }
 }
