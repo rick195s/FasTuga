@@ -17,7 +17,11 @@ class DriverPolicy
 
     public function orders(User $user)
     {
-        return true;
-        return $user->driver != null;
+        return $user->driver;
+    }
+
+    public function statistics(User $user)
+    {
+        return $user->driver;
     }
 }

@@ -56,7 +56,11 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/drivers/{driver}/orders', [DriverController::class, 'orders']);
 
     //Statistics
-    Route::get('drivers/{driver}/statistics', [StatisticsController::class, 'statistics']);
+    Route::get('drivers/{driver}/statistics', [StatisticsController::class, 'driverStatistics']);
+
+    Route::get('statistics', [StatisticsController::class, 'mainStatistics']);
+
+
 
     // CRUD orders to driver delivery
     Route::get("/orders/drivers", [OrdersDeliveryController::class, "index"]);
@@ -77,5 +81,4 @@ Route::middleware('auth:api')->group(function () {
     Route::apiResource('products', ProductsController::class)->except(['index', 'show']);
 
     Route::apiResource('orders', OrdersController::class)->except(['destroy', 'store']);
-
 });
