@@ -62,6 +62,11 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request, User $user)
     {
         $validated = $request->validated();
+        if ($user->isCustomer()) {
+
+            $user->customer->update($validated);
+            return $validated;
+        }
 
         if (isset($validated['password'])) {
             $validated['password'] = Hash::make($validated['password']);
@@ -69,7 +74,7 @@ class UserController extends Controller
 
         $user->update($validated);
 
-        return new UserResource($user);
+        return $user->isCustomer() ? new CustomerResource($user->customer) : new UserResource($user);
     }
 
 

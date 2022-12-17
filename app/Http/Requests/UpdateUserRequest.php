@@ -40,14 +40,14 @@ class UpdateUserRequest extends FormRequest
 
             ],
             'phone' => [
-                'numeric', 'digits:9', 'unique:customers'
+                'numeric', 'digits:9', 'unique:customers,phone,' . $this->user->customer?->id
             ],
             'nif' => [
-                'numeric', 'digits:9', 'unique:customers'
+                'numeric', 'digits:9', 'unique:customers,nif,' . $this->user->customer?->id
             ],
             'photo' => ['image', 'mimes:jpeg,png,jpg', 'max:2048'],
-            'default_payment_type' => 'string|in:VISA,PAYPAL,MBWAY',
-            'default_payment_id' => 'string|max:50'
+            'default_payment_type' => 'required_if:default_payment_id,true|string|in:VISA,PAYPAL,MBWAY',
+            'default_payment_id' => 'required_if:default_payment_type,true|string|max:50'
         ];
     }
 
