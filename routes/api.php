@@ -54,6 +54,8 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/drivers/{driver}', [DriverController::class, 'update']);
     // orders of a driver
     Route::get('/drivers/{driver}/orders', [DriverController::class, 'orders']);
+    // history of orders of a customer
+    Route::get('/customer/{customer}/orders', [OrdersController::class, 'customerHistory']);
 
     //Statistics
     Route::get('drivers/{driver}/statistics', [StatisticsController::class, 'driverStatistics']);
