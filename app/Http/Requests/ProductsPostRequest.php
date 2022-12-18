@@ -25,7 +25,7 @@ class ProductsPostRequest extends FormRequest
     {
         return [
             'name' => 'required|string|unique:products,name|max:50',
-            'type' => 'required|string|in:hot dish,cold dish,drink, dessert',
+            'type' => 'required|string|in:hot dish,cold dish,drink,dessert',
             'description' => 'required|string|max:255',
             'photo' => ['required', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
             'price' => 'required|numeric|gt:0',
