@@ -20,7 +20,7 @@ class ProductsController extends Controller
      */
     public function index()
     {
-        return ProductResource::collection(Product::orderBy('name')->get());
+        return ProductResource::collection(Product::orderBy('name')->paginate(10));
     }
 
     public function productType()
