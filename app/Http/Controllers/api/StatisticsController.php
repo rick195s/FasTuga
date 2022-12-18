@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Resources\DriverResource;
 use App\Http\Resources\OrderDriverDeliveryResource;
+use App\Models\Customer;
 use App\Models\Driver;
 use App\Models\Order;
 use Carbon\CarbonInterval;
@@ -95,8 +96,9 @@ class StatisticsController extends Controller
             ->sum('tax_fee');
     }
 
-    public function statistics(Driver $driver)
+    public function driverStatistics(Driver $driver)
     {
+        $this->authorize('statistics', $driver);
         //starting a new collection
         $statisticsCollection = collect([]);
 
@@ -132,5 +134,15 @@ class StatisticsController extends Controller
         $statisticsCollection->offsetSet('balance', $balance);
 
         return $statisticsCollection;
+    }
+
+    public function mainStatistics()
+    {
+        $this->authorize('mainStatistics', User::class);
+        return [
+            "customers_count" => Customer::count(),
+            "sales" => number_format(Order::where('status', 'D')->sum('total_price'), 0, ',', ','),
+            "orders_count" => Order::count(),
+        ];
     }
 }

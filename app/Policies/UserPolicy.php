@@ -95,4 +95,9 @@ class UserPolicy
     {
         return $user->isManager() && $user->id !== $model->id;
     }
+
+    public function mainStatistics(User $user)
+    {
+        return $user->isManager();
+    }
 }

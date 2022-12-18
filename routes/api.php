@@ -6,6 +6,7 @@ use App\Http\Controllers\api\DriverController;
 use App\Http\Controllers\api\OrderItemsController;
 use App\Http\Controllers\api\OrdersController;
 use App\Http\Controllers\api\OrdersDeliveryController;
+use App\Http\Controllers\api\ProductsController;
 use App\Http\Controllers\api\StatisticsController;
 use Illuminate\Support\Facades\Route;
 
@@ -29,6 +30,11 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register/driver', [AuthController::class, 'registerDriver']);
 Route::post('/login/driver', [AuthController::class, 'loginDriver']);
 
+Route::get('/products', [ProductsController::class, 'index']);
+Route::get('/products/type', [ProductsController::class, 'productType']);
+
+Route::post('/orders', [OrdersController::class, 'store']);
+
 Route::middleware('auth:api')->group(function () {
     Route::get('/me', [UserController::class, 'show_me']);
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -50,7 +56,11 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/drivers/{driver}/orders', [DriverController::class, 'orders']);
 
     //Statistics
-    Route::get('drivers/{driver}/statistics', [StatisticsController::class, 'statistics']);
+    Route::get('drivers/{driver}/statistics', [StatisticsController::class, 'driverStatistics']);
+
+    Route::get('statistics', [StatisticsController::class, 'mainStatistics']);
+
+
 
     // CRUD orders to driver delivery
     Route::get("/orders/drivers", [OrdersDeliveryController::class, "index"]);
@@ -62,6 +72,13 @@ Route::middleware('auth:api')->group(function () {
     Route::patch('users/{user}/toggleBlocked', [UserController::class, 'toggle_blocked']);
     Route::post('users/{user}/photo', [UserController::class, 'update_photo']);
 
+    //--------------------------------------
+
+    Route::post('products/{product}/photo', [ProductsController::class, 'update_photo']);
+
     Route::apiResource('users', UserController::class);
-    Route::apiResource('orders', OrdersController::class)->except(['destroy']);
+
+    Route::apiResource('products', ProductsController::class)->except(['index', 'show']);
+
+    Route::apiResource('orders', OrdersController::class)->except(['destroy', 'store']);
 });
