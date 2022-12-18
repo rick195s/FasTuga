@@ -63,9 +63,7 @@ class UserController extends Controller
     {
         $validated = $request->validated();
         if ($user->isCustomer()) {
-
             $user->customer->update($validated);
-            return $validated;
         }
 
         if (isset($validated['password'])) {
