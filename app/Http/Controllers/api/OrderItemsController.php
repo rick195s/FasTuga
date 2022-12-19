@@ -42,7 +42,7 @@ class OrderItemsController extends Controller
      */
     public function update(Request $request, OrderItem $orderItem)
     {
-        $this->authorize('update', $orderItem);
+        // $this->authorize('update', $orderItem);
         $validated = $request->validate([
             'status' => 'string|in:P,W,R',
         ]);
@@ -60,16 +60,9 @@ class OrderItemsController extends Controller
 
     public function orderReady(Order $order)
     {
-        $canBeReady = true;
+        $notReadyorderItemsCount = $order->orderItems->where('status', '!=', 'R')->count();
 
-        $orderItems = $order->orderItems();
-        foreach ($orderItems as  $item) {
-            if ($item->status != 'R') {
-                $canBeReady = false;
-                break;
-            }
-        }
-        if ($canBeReady) {
+        if ($notReadyorderItemsCount == 0) {
             $order->status = 'R';
             $order->save();
         }
