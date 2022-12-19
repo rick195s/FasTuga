@@ -43,6 +43,9 @@ class DatabaseSeeder extends Seeder
         $this->call(ProductsSeeder::class);
         $this->call(UsersSeeder::class);
         $this->call(OrdersSeeder::class);
+        $this->call(DriversSeeder::class);
+        $this->call(OrderDriverDeliverySeeder::class);
+
 
         $this->command->info("-----------------------------------------------");
         $this->command->info("END of database seeder");

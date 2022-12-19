@@ -172,23 +172,7 @@ class UsersSeeder extends Seeder
                 'updated_at' => $user['updated_at'],
                 'deleted_at' => $user['deleted_at'],
             ]);
-        } elseif ($user['type'] == 'ED' && rand(1, 100) < 30) {
-            // Used to create Employee Delivery Drivers (FasTuga Driver Integration)
-
-            DB::table('drivers')->insert([
-                'user_id' => $newId,
-                'phone' => $faker->phoneNumber,
-
-                'license_plate' => $faker->regexify('[A-Z0-9]{2}-[A-Z0-9]{2}-[A-Z0-9]{2}'),
-                //'license_plate' => $faker->regexify('[\d\w]{2}[-][\d\w]{2}[-][\d\w]{2}|[\d\w]{2}[ ][\d\w]{2}[ ][\d\w]{2}'),
-
-
-                'created_at' => $user['created_at'],
-                'updated_at' => $user['updated_at'],
-                'deleted_at' => $user['deleted_at'],
-            ]);
         }
-
 
         return $userInfo;
     }

@@ -7,7 +7,6 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
 
 class OrdersSeeder extends Seeder
 {
@@ -17,7 +16,6 @@ class OrdersSeeder extends Seeder
     private $customerDetails = [];
     private $chefIDs = [];
     private $deliveryIDs = [];
-    private $driversIDs = [];
     private $productIDs = [];
     private $productPrices = [];
     private $paymentTypes = ['VISA', 'PAYPAL', 'MBWAY'];
@@ -47,10 +45,6 @@ class OrdersSeeder extends Seeder
 
         $this->command->info("Preparing Delivery");
         $this->deliveryIDs = Arr::pluck(DB::select("select id  from users where type = 'ED'"), 'id');
-
-        // Used to create Orders_Driver_Delivery (FasTuga Driver Integration)
-        $this->command->info("Preparing Drivers");
-        $this->driversIDs = Arr::pluck(DB::select("select user_id from drivers"), 'user_id');
 
         $this->command->info("Preparing Customers");
         $arrayCustomers = DB::select('select id, user_id, default_payment_type, default_payment_reference from customers');
@@ -83,21 +77,14 @@ class OrdersSeeder extends Seeder
                 $ordersDay[] = $this->createOrderArray($faker, $d, $num);
             }
             DB::table('orders')->insert($ordersDay);
+            $ids = DB::table('orders')->where('date', $d->format('Y-m-d'))->pluck('id')->toArray();
 
-            $ordersAux = DB::table('orders')->select('id', 'delivered_by', 'created_at', 'status')
-                ->where('date', $d->format('Y-m-d'))->get()->toArray();
-
-            $countOrdersDriverDelivery  = 0;
-
-            foreach ($ordersAux as $order) {
+            foreach ($ids as $id) {
                 $allItems = [];
-                $total = $this->createOrderItemsArray($faker, $allItems, $order->id);
+                $total = $this->createOrderItemsArray($faker, $allItems, $id);
                 DB::table('order_items')->insert($allItems);
                 //DB::update('update orders set total_price = ? where id = ?', [$total, $id]);
-                $countOrdersDriverDelivery += $this->seedOrderDriverDelivery($faker, $order);
             }
-            $this->command->info("Entregas ao domicilio:  " . $countOrdersDriverDelivery);
-
             $i++;
             $d->addDays(1);
         }
@@ -124,7 +111,7 @@ class OrdersSeeder extends Seeder
             $paymentType = $faker->randomElement($this->paymentTypes);
             $paymentRef = UsersSeeder::getRandomPaymentReference($faker, $paymentType);
         }
-        $status = rand(0, 40) == 1 ? 'R' : 'D';
+        $status = rand(0, 40) == 1 ? 'C' : 'D';
 
         return [
             'status' => $status,
@@ -161,95 +148,6 @@ class OrdersSeeder extends Seeder
         }
     }
 
-
-    // FastugaDriver
-    public function seedOrderDriverDelivery($faker, $order)
-    {
-
-        if (rand(0, 2) == 1) {
-            DB::table('orders')->update(['delivered_by' => null]);
-        }
-
-        $ordersDriverDelivery = [];
-
-
-        // Check if order was delivered by a driver
-        // if so we need to create the corresponding record
-        // in orders_driver_delivery  (FasTuga Driver Integration)
-        if (in_array($order->delivered_by, $this->driversIDs)) {
-            $ordersDriverDelivery[] = $this->createOrdersDriverDeliveryArray($faker, $order->id, $order->created_at, $order->status);
-            // (FasTuga Driver Integration)
-            DB::table('orders_driver_delivery')->insert($ordersDriverDelivery);
-            return 1;
-        }
-    }
-    // Create the orders_driver_delivery record (FasTuga Driver Integration)
-    private function createOrdersDriverDeliveryArray($faker, $id_order, $created_at, $order_status)
-    {
-
-        if ($order_status == 'R') {
-            $inicio = null;
-            $fim = null;
-        } else {
-            $inicio = Carbon::parse($created_at)->addSeconds(rand(39600, 78000));
-            $fim = $inicio->copy()->addSeconds(rand(100, 900));
-        }
-
-        $tax_fee = Arr::random([2, 3, 5]);
-
-        $fakerAddress = $faker->address;
-        //$locationdata = Http::get('http://api.positionstack.com/v1/forward?access_key=ce376ccadaa61d0f359a19b28d856659&query='.$fakerAddress)->object();
-        $locationdata = Http::get("https://api.mapbox.com/geocoding/v5/mapbox.places/" . $fakerAddress . ".json?access_token=" . env('MAPBOX_ACCESS_TOKEN'))
-            ->object()->features[0]->center;
-
-        if ($locationdata[0] != null && $locationdata[1] != null) {
-            $latitude = $locationdata[1];
-            $longitude = $locationdata[0];
-        } else {
-            $this->command->info("Is null");
-            $latitude = 39.734730;
-            $longitude = -8.820921;
-        }
-
-        //$this->command->info("OBJ: "+$locationdata+"\n");
-        /*$object = $locationdata->object();*/
-        /* $latitude = $locationdata->latitude;
-        $this->command->info("LATITUDE-> ".$latitude);
-        $longitude =  $locationdata->longitude;*/
-        $latitudeFastuga = 39.734730;
-        $longitudeFastuga = -8.820921;
-
-        return [
-            'order_id' => $id_order,
-            'delivery_location' => $fakerAddress,
-            'tax_fee' => $tax_fee,
-            'delivery_started_at' => $inicio,
-            'delivery_ended_at' => $fim,
-            'distance' => $this->distance($latitude, $longitude, $latitudeFastuga, $longitudeFastuga, "K")
-        ];
-    }
-
-    function distance($lat1, $lon1, $lat2, $lon2, $unit)
-    {
-        if (($lat1 == $lat2) && ($lon1 == $lon2)) {
-            return 0;
-        } else {
-            $theta = $lon1 - $lon2;
-            $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) +  cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
-            $dist = acos($dist);
-            $dist = rad2deg($dist);
-            $miles = $dist * 60 * 1.1515;
-            $unit = strtoupper($unit);
-
-            if ($unit == "K") {
-                return ($miles * 1.609344);
-            } else if ($unit == "N") {
-                return ($miles * 0.8684);
-            } else {
-                return $miles;
-            }
-        }
-    }
 
     private function seedPoints()
     {
