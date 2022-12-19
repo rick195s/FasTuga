@@ -35,6 +35,7 @@ Route::get('/products', [ProductsController::class, 'index']);
 Route::get('/products/type', [ProductsController::class, 'productType']);
 
 Route::post('/orders', [OrdersController::class, 'store']);
+Route::get('/tickets', [OrdersController::class, 'tickets']);
 
 Route::middleware('auth:api')->group(function () {
     Route::get('/me', [UserController::class, 'show_me']);
