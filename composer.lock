@@ -4011,6 +4011,7 @@
         },
         {
             "name": "symfony/console",
+
             "version": "v6.2.1",
             "source": {
                 "type": "git",
@@ -4103,6 +4104,7 @@
                     "type": "tidelift"
                 }
             ],
+
             "time": "2022-12-01T13:44:20+00:00"
         },
         {
@@ -4536,6 +4538,7 @@
         },
         {
             "name": "symfony/http-foundation",
+
             "version": "v6.2.1",
             "source": {
                 "type": "git",
@@ -4610,6 +4613,7 @@
                     "type": "tidelift"
                 }
             ],
+
             "time": "2022-12-04T18:26:13+00:00"
         },
         {
@@ -4705,6 +4709,7 @@
             "description": "Provides a structured process for converting a Request into a Response",
             "homepage": "https://symfony.com",
             "support": {
+
                 "source": "https://github.com/symfony/http-kernel/tree/v6.2.1"
             },
             "funding": [
@@ -4784,6 +4789,7 @@
             "description": "Helps sending emails",
             "homepage": "https://symfony.com",
             "support": {
+
                 "source": "https://github.com/symfony/mailer/tree/v6.2.1"
             },
             "funding": [
@@ -4800,6 +4806,7 @@
                     "type": "tidelift"
                 }
             ],
+
             "time": "2022-12-06T16:54:23+00:00"
         },
         {
@@ -4883,6 +4890,7 @@
                     "type": "tidelift"
                 }
             ],
+
             "time": "2022-11-28T12:28:19+00:00"
         },
         {
@@ -7650,6 +7658,7 @@
                     "type": "github"
                 }
             ],
+
             "time": "2022-12-13T07:49:28+00:00"
         },
         {
