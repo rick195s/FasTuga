@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\api\AuthController;
+use App\Http\Controllers\api\CustomerController;
 use App\Http\Controllers\api\UserController;
 use App\Http\Controllers\api\DriverController;
 use App\Http\Controllers\api\OrderItemsController;
@@ -55,7 +56,7 @@ Route::middleware('auth:api')->group(function () {
     // orders of a driver
     Route::get('/drivers/{driver}/orders', [DriverController::class, 'orders']);
     // history of orders of a customer
-    Route::get('/customer/{customer}/orders', [OrdersController::class, 'customerHistory']);
+    Route::get('/customer/{customer}/orders', [CustomerController::class, 'ordersHistory']);
 
     //Statistics
     Route::get('drivers/{driver}/statistics', [StatisticsController::class, 'driverStatistics']);

@@ -244,9 +244,4 @@ class OrdersController extends Controller
         $this->authorize('viewToDeliver', Order::class);
         return OrderResource::collection(Order::where('status', 'R')->orderBy('status')->paginate(10));
     }
-
-    public function customerHistory(Request $request, $customer)
-    {
-        return OrderResource::collection(Order::where('customer_id', $customer)->orderBy('status')->paginate(10));
-    }
 }
