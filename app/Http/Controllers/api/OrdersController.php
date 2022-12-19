@@ -33,6 +33,14 @@ class OrdersController extends Controller
         return OrderResource::collection(Order::orderBy('status')->paginate(10));
     }
 
+    public function tickets()
+    {
+        //filtrar por etiquetas válidas
+        return OrderResource::collection(
+            Order::whereIn('status',['R','P'])->whereNotNull('ticket_number')->orderBy('ticket_number')->paginate(10)
+        );
+    }
+
     /**
      * Store a newly created resource in storage.
      *
