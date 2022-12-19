@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateOrderRequest;
 use App\Http\Resources\Detailed\OrderDetailedResource;
 use App\Http\Resources\OrderResource;
+use App\Http\Resources\TicketResource;
 use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -36,9 +37,10 @@ class OrdersController extends Controller
     public function tickets()
     {
         //filtrar por etiquetas válidas
-        return OrderResource::collection(
-            Order::whereIn('status',['R','P'])->whereNotNull('ticket_number')->orderBy('ticket_number')->paginate(10)
-        );
+        return TicketResource::collection(Order::select('ticket_number', 'id', 'status')->whereIn('status', ['R', 'P'])->whereNotNull('ticket_number')
+            ->orderBy('ticket_number')
+            ->limit(99)
+            ->get());
     }
 
     /**

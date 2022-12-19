@@ -68,7 +68,7 @@ class Order extends Model
         return $this->belongsTo(User::class, 'delivered_by', 'id');
     }
 
-    public function statusToString()
+    public function statusToString($newStatus = null)
     {
         switch ($this->status) {
             case 'R':
