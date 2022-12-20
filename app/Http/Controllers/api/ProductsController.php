@@ -18,14 +18,19 @@ class ProductsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return ProductResource::collection(Product::orderBy('name')->paginate(10));
+        return ProductResource::collection(
+            Product::where('type', '=', $request->query('type'))
+                ->orderBy('name')
+                ->limit(60)
+                ->get()
+        );
     }
 
-    public function productType()
+    public function indexPaginate()
     {
-        return Product::select('type')->distinct()->get();
+        return ProductResource::collection(Product::orderBy('name')->paginate(10));
     }
 
     /**

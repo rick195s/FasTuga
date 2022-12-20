@@ -32,7 +32,7 @@ Route::post('/register/driver', [AuthController::class, 'registerDriver']);
 Route::post('/login/driver', [AuthController::class, 'loginDriver']);
 
 Route::get('/products', [ProductsController::class, 'index']);
-Route::get('/products/type', [ProductsController::class, 'productType']);
+Route::get('/products/paginate', [ProductsController::class, 'indexPaginate']);
 
 Route::post('/orders', [OrdersController::class, 'store']);
 Route::get('/tickets', [OrdersController::class, 'tickets']);
