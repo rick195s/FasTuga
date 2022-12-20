@@ -20,17 +20,19 @@ class ProductsController extends Controller
      */
     public function index(Request $request)
     {
-        return ProductResource::collection(
-            Product::where('type', '=', $request->query('type'))
-                ->orderBy('name')
-                ->limit(60)
-                ->get()
-        );
-    }
+        if ($request->query('type')) {
+            return ProductResource::collection(
+                Product::where('type', '=', $request->query('type'))
+                    ->orderBy('name')
+                    ->limit(60)
+                    ->get()
+            );
+        }
 
-    public function indexPaginate()
-    {
-        return ProductResource::collection(Product::orderBy('name')->paginate(10));
+        return ProductResource::collection(
+            Product::orderBy('name')
+                ->paginate(10)
+        );
     }
 
     /**
