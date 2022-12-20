@@ -20,7 +20,7 @@ class OrderItemDetailedResource extends JsonResource
         return [
             "id" => $this->id,
             "order_id" => $this->order_id,
-            "local_number" => $this->order_local_number,
+            "local_number" => $this->order->ticket_number . "-" . $this->order_local_number,
             "status" => $this->statusToString(),
             "price_on_purchase" => $this->price,
             "notes" => $this->notes,
