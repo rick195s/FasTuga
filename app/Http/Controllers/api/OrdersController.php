@@ -90,7 +90,7 @@ class OrdersController extends Controller
             $order->ticket_number = $this->getTicketNumber();
             DB::beginTransaction();
 
-            $user?->customer->save();
+            $user?->customer?->save();
             $order->save();
             $this->createOrderItems($validated['items'], $order->id);
             DB::commit();
