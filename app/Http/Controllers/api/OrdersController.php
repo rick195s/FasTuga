@@ -68,6 +68,9 @@ class OrdersController extends Controller
 
             $order = new Order();
 
+            $order->payment_type = $validated["payment_type"];
+            $order->payment_reference = $validated["payment_reference"];
+
             $order->total_price = $validated["total"];
             $order->total_paid = $order->total_price;
             $order->total_paid_with_points = 0;

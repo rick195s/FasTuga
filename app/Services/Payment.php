@@ -51,8 +51,8 @@ class Payment
             !$this->validator->validateEmail("payment_reference", $this->payment_reference, [])
             || !Str::endsWith($this->payment_reference, ['.com', '.pt'])
         ) {
-            $this->validator->errors()->add('payment_reference', "Payment reference must be email or end with '.com' or '.pt'");
-            $this->validator->errors()->add('default_payment_reference', "Payment reference must be email or end with '.com' or '.pt'");
+            $this->validator->errors()->add('payment_reference', "Payment reference must be email and end with '.com' or '.pt'");
+            $this->validator->errors()->add('default_payment_reference', "Payment reference must be email and end with '.com' or '.pt'");
         };
 
         if ($this->total && $this->total > 50) {
