@@ -38,6 +38,13 @@ class CreateOrderRequest extends FormRequest
         ];
     }
 
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'payment_type' => Str::upper($this->payment_type),
+        ]);
+    }
+
     public function validated($key = null, $default = null)
     {
         return array_merge(parent::validated($key, $default), [

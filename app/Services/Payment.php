@@ -36,8 +36,8 @@ class Payment
             Str::length(trim($this->payment_reference)) != 9 ||
             !Str::startsWith($this->payment_reference, '9')
         ) {
-            $this->validator->errors()->add('payment_reference', 'Payment reference must have length 9 and start with "9"');
-            $this->validator->errors()->add('default_payment_reference', 'Payment reference must have length 9 and start with "9"');
+            $this->validator->errors()->add('payment_reference', "Payment reference must have length 9 and start with '9'");
+            $this->validator->errors()->add('default_payment_reference', "Payment reference must have length 9 and start with '9'");
         };
 
         if ($this->total && $this->total > 10) {
@@ -51,8 +51,8 @@ class Payment
             !$this->validator->validateEmail("payment_reference", $this->payment_reference, [])
             || !Str::endsWith($this->payment_reference, ['.com', '.pt'])
         ) {
-            $this->validator->errors()->add('payment_reference', 'Payment reference must be email or end with ".com" or ".pt"');
-            $this->validator->errors()->add('default_payment_reference', 'Payment reference must be email or end with ".com" or ".pt"');
+            $this->validator->errors()->add('payment_reference', "Payment reference must be email or end with '.com' or '.pt'");
+            $this->validator->errors()->add('default_payment_reference', "Payment reference must be email or end with '.com' or '.pt'");
         };
 
         if ($this->total && $this->total > 50) {
@@ -66,8 +66,8 @@ class Payment
             Str::length(trim($this->payment_reference)) != 16 ||
             !Str::startsWith($this->payment_reference, '4')
         ) {
-            $this->validator->errors()->add('payment_reference', 'Payment reference must have length 16 and start with "4"');
-            $this->validator->errors()->add('default_payment_reference', 'Payment reference must have length 16 and start with "4"');
+            $this->validator->errors()->add('payment_reference', "Payment reference must have length 16 and start with '4'");
+            $this->validator->errors()->add('default_payment_reference', "Payment reference must have length 16 and start with '4'");
         };
 
         if ($this->total && $this->total > 200) {
