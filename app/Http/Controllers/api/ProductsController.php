@@ -24,14 +24,14 @@ class ProductsController extends Controller
             return ProductResource::collection(
                 Product::where('type', '=', $request->query('type'))
                     ->orderBy('name')
-                    ->limit(60)
                     ->paginate(10)
+                    ->withQueryString()
             );
         }
 
         return ProductResource::collection(
             Product::orderBy('name')
-                ->paginate(10)
+                ->paginate(2)
         );
     }
 
