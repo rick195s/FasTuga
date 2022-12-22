@@ -25,7 +25,7 @@ class ProductsController extends Controller
                 Product::where('type', '=', $request->query('type'))
                     ->orderBy('name')
                     ->limit(60)
-                    ->get()
+                    ->paginate(10)
             );
         }
 
