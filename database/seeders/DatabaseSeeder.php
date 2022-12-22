@@ -26,11 +26,11 @@ class DatabaseSeeder extends Seeder
 
         DB::table('users')->delete();
         DB::table('customers')->delete();
-        DB::table('drivers')->delete();
-        DB::table('orders_driver_delivery')->delete();
         DB::table('products')->delete();
         DB::table('order_items')->delete();
         DB::table('orders')->delete();
+        //DB::table('drivers')->delete();
+        //DB::table('orders_driver_delivery')->delete();
 
         DB::statement('ALTER TABLE users AUTO_INCREMENT = 0');
         DB::statement('ALTER TABLE products AUTO_INCREMENT = 0');
@@ -43,8 +43,8 @@ class DatabaseSeeder extends Seeder
         $this->call(ProductsSeeder::class);
         $this->call(UsersSeeder::class);
         $this->call(OrdersSeeder::class);
-        $this->call(DriversSeeder::class);
-        $this->call(OrderDriverDeliverySeeder::class);
+        //$this->call(DriversSeeder::class);
+        //$this->call(OrderDriverDeliverySeeder::class);
 
 
         $this->command->info("-----------------------------------------------");

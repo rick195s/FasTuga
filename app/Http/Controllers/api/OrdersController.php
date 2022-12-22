@@ -92,7 +92,9 @@ class OrdersController extends Controller
 
             $user?->customer?->save();
             $order->save();
-            $this->createOrderItems($validated['items'], $order->id);
+            $orderStatus = $this->createOrderItems($validated['items'], $order->id);
+            $order->status = $orderStatus;
+            $order->save();
             DB::commit();
 
             return new OrderDetailedResource($order);
@@ -104,6 +106,7 @@ class OrdersController extends Controller
         }
     }
 
+    // returns the order status
     public function createOrderItems($items, $order_id)
     {
         $quantities = collect($items)->pluck('quantity', 'product_id');
@@ -111,23 +114,30 @@ class OrdersController extends Controller
         $products = Product::select('price', 'type', 'id')->whereIn('id', $quantities->keys())->get();
 
         $order_items = [];
+        $orderStatus = 'R';
 
         $order_local_number = 1;
         foreach ($products as $product) {
+            $orderItemsStatus =  $this->getOrderItemStatus($product->type);
             for ($i = 0; $i < $quantities->get($product->id); $i++) {
                 $order_items[] = [
                     'order_id' => $order_id,
                     'order_local_number' => $order_local_number,
                     'product_id' => $product->id,
-                    'status' => $this->getOrderItemStatus($product->type),
+                    'status' => $orderItemsStatus,
                     'price' => $product->price,
                     'preparation_by' => $this->getPreparationBy($product->type),
                     'notes' => $notes->get($product->id),
                 ];
                 $order_local_number++;
             }
+            if ($orderItemsStatus == 'W') {
+                $orderStatus = 'P';
+            }
         }
         OrderItem::insert($order_items);
+
+        return $orderStatus;
     }
 
     public function getPreparationBy($productType)
