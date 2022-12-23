@@ -59,6 +59,6 @@ class OrderPolicy
     public function update(User $user, Order $order)
     {
         return $user->isManager() ||
-            ($user->driver && ($order->delivered_by == null || $order->delivered_by == $user->id));
+            ($user->isEmployeeDelivery() && ($order->delivered_by == null || $order->delivered_by == $user->id));
     }
 }

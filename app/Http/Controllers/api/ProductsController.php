@@ -31,7 +31,7 @@ class ProductsController extends Controller
 
         return ProductResource::collection(
             Product::orderBy('name')
-                ->paginate(2)
+                ->paginate(10)
         );
     }
 
